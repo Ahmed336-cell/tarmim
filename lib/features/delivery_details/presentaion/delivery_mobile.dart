@@ -1,5 +1,8 @@
 import 'package:country_state_city_pro/country_state_city_pro.dart';
 import 'package:flutter/material.dart';
+import 'package:tarmim/core/commons/custom_text_field.dart';
+
+import '../../../core/commons/custom_button.dart';
 
 class DeliveryMobile extends StatelessWidget {
   DeliveryMobile({Key? key}) : super(key: key);
@@ -23,31 +26,30 @@ class DeliveryMobile extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              _buildTextField(),
+              CustomTextField(maxLines: 1,label: "Name"),
               const SizedBox(height: 16),
               spinnerAddress(),
               const SizedBox(height: 16),
-              _buildLabeledField("Phone Number"),
+              const Text(
+                "Phone Number",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8,),
+              CustomTextField(maxLines: 1,label: "01xxxxxxxxxx"),
               const SizedBox(height: 16),
-              _buildLabeledField("Address", maxLines: 1),
+              SizedBox(height: 8,),
+              const Text(
+                "Address",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              CustomTextField(label: "Address", maxLines: 1),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 height: 60,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Save Address logic
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade900,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Save Address',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
+                child: CustomButton(
+                  text: "Save Address",
+                  onPressed: () {},
                 ),
               ),
             ],
@@ -57,33 +59,9 @@ class DeliveryMobile extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField({int maxLines = 1}) {
-    return TextFormField(
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
 
-  Widget _buildLabeledField(String label, {int maxLines = 1}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        _buildTextField(maxLines: maxLines),
-      ],
-    );
-  }
+
+
 
   Widget spinnerAddress() {
     return CountryStateCityPicker(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tarmim/core/commons/custom_button.dart';
 
 class ProductDetailsMobile extends StatelessWidget {
   const ProductDetailsMobile({super.key});
@@ -16,7 +17,9 @@ class ProductDetailsMobile extends StatelessWidget {
           onPressed: () {},
         ),
         actions: [
-          SvgPicture.asset('assets/images/cart.svg' , width: 50, height: 60,),
+          InkWell(child: SvgPicture.asset('assets/images/cart.svg' , width: 50, height: 60,),
+          onTap: (){},
+          ),
 
         ],
       ),
@@ -117,13 +120,7 @@ class ProductDetailsMobile extends StatelessWidget {
                   ),
                 ),
 
-                MaterialButton(onPressed: (){},
-                  color: Colors.blue.shade900,
-                  minWidth: double.infinity,
-                  height: 60,
-                  child: Text('Add to Cart', style: TextStyle(color: Colors.white, fontSize: 20),),
-
-                )
+               CustomButton(text: "Add to Cart", onPressed: (){})
               ],
             ),
           )

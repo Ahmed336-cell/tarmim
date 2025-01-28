@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../core/commons/custom_button.dart';
 class ProductDetailsWeb extends StatelessWidget {
   const ProductDetailsWeb({super.key});
 
@@ -11,7 +13,9 @@ class ProductDetailsWeb extends StatelessWidget {
         elevation: 0,
 
         actions: [
-          SvgPicture.asset('assets/images/cart.svg' , width: 50, height: 60,),
+          InkWell(child: SvgPicture.asset('assets/images/cart.svg' , width: 50, height: 60,),
+          onTap: (){},
+          ),
         ],
       ),
       body: Padding(
@@ -26,7 +30,7 @@ class ProductDetailsWeb extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
                   'assets/images/elicit.png', // Replace with actual product image URL
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   width: 300,
                   height: 400,
                 ),
@@ -83,7 +87,9 @@ class ProductDetailsWeb extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         child: Image.asset(
                           'assets/images/elicit.png', // Replace with actual thumbnails
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fill,
+                          width: 30,
+                          height: 30,
                         ),
                       );
                     },
@@ -101,13 +107,8 @@ class ProductDetailsWeb extends StatelessWidget {
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                   SizedBox(height:24 ,),
-                  MaterialButton(onPressed: (){},
-                    color: Colors.blue.shade900,
-                    minWidth: double.infinity,
-                    height: 60,
-                    child: Text('Add to Cart', style: TextStyle(color: Colors.white, fontSize: 20),),
+                  CustomButton(text: "Add to Cart", onPressed: (){})
 
-                  )
                 ],
               ),
             ),
