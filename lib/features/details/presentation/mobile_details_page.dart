@@ -1,28 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tarmim/core/commons/custom_button.dart';
+import 'package:tarmim/features/cart/presentation/cart_respo.dart';
 
-class ProductDetailsMobile extends StatelessWidget {
+class ProductDetailsMobile extends StatefulWidget {
   const ProductDetailsMobile({super.key});
+
+  @override
+  _ProductDetailsMobileState createState() => _ProductDetailsMobileState();
+}
+
+class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
+  int _quantity = 1; // Default quantity set to 1
+
+  void _increaseQuantity() {
+    setState(() {
+      _quantity++;
+    });
+  }
+
+  void _decreaseQuantity() {
+    setState(() {
+      if (_quantity > 1) {
+        _quantity--;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
-        ),
-        actions: [
-          InkWell(child: SvgPicture.asset('assets/images/cart.svg' , width: 50, height: 60,),
-          onTap: (){},
-          ),
-
-        ],
-      ),
       body: CustomScrollView(
         slivers: [
           SliverFillRemaining(
@@ -61,7 +69,7 @@ class ProductDetailsMobile extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 16,),
+                SizedBox(height: 16),
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -78,20 +86,48 @@ class ProductDetailsMobile extends StatelessWidget {
                           style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                         SizedBox(height: 8),
-                        Text(
-                          'Ramadan Notebook',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Ramadan Notebook',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            Column(
+                              children: [
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(Colors.brown),
+                                  ),
+                                  onPressed: _increaseQuantity,
+                                  child: Icon(Icons.add, color: Colors.white,),
+                                ),
+                                Text(
+                                  '$_quantity',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(Colors.brown),
+                                  ),
+                                  onPressed: _decreaseQuantity,
+                                  child: Icon(Icons.remove, color: Colors.white,),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 8),
+                        SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               'Price',
-                              style: TextStyle(fontSize: 18, color: Colors.black),
+                              style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               '120 EGP',
@@ -102,8 +138,7 @@ class ProductDetailsMobile extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // Small Images
-                        SizedBox(height: 8,),
+                        SizedBox(height: 8),
                         Text(
                           'Description',
                           style: TextStyle(
@@ -115,20 +150,25 @@ class ProductDetailsMobile extends StatelessWidget {
                           'adasdas asdasdbaksdba asfbasblfab asaslnflasfnaf alsnfalsfnflas ',
                           style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
+                        SizedBox(height: 16),
+                        // Quantity Selector
+
                       ],
                     ),
                   ),
                 ),
-
-               CustomButton(text: "Add to Cart", onPressed: (){})
+                SizedBox(height: 16),
+                CustomButton(
+                  text: "Add to Cart",
+                  onPressed: () {
+                    // Handle add to cart action
+                  },
+                ),
               ],
             ),
-          )
+          ),
         ],
-
       ),
     );
   }
 }
-
-

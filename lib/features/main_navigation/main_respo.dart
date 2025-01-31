@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:tarmim/features/cart/presentation/cart_mobile.dart';
-import 'package:tarmim/features/cart/presentation/cart_web.dart';
+import 'package:tarmim/features/main_navigation/main_mobile.dart';
+import 'package:tarmim/features/main_navigation/main_web.dart';
 
-import '../../../constants.dart';
-class CartRespo extends StatelessWidget {
-  const CartRespo({super.key});
+import '../../constants.dart';
+
+class MainRespo extends StatelessWidget {
+  const MainRespo({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,15 +14,15 @@ class CartRespo extends StatelessWidget {
         if (constraints.maxWidth > 600) {
           return Scaffold(
 
-            body: const CartWeb(),
+            body: const MainWeb(),
           );
         } else {
           return Scaffold(
-
-            body: const CartMobile(),
+            body: const MainMobile(),
           );
         }
       },
     );
   }
 }
+

@@ -90,7 +90,23 @@ class CartWeb extends StatelessWidget {
                         ),
                         const Divider(height: 24),
                         // Payment Method
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
 
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter Promo Code',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Expanded( // FIX: Prevents layout issues
+                              child: CustomButton(text: 'Apply', onPressed: () {}),
+                            ),
+                          ],
+                        ),
                         // Order Info
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),

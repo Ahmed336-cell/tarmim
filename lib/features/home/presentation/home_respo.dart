@@ -18,15 +18,7 @@ class HomeRespo extends StatelessWidget {
             );
           } else {
             return Scaffold(
-              appBar: AppBar(
 
-                backgroundColor: Color(Constant.color),
-                centerTitle: true,
-                title: const Text(
-                  'Home',
-                  style: TextStyle(fontSize: 24,color: Colors.brown, fontWeight: FontWeight.bold),
-                ),
-              ),
               body: const MobileHomePage(),
             );
           }

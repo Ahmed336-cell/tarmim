@@ -40,7 +40,7 @@ class WebHomePage extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(), // Prevent GridView from scrolling independently
                     itemCount: 8, // Adjust the number of items
                     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 300,
+                      maxCrossAxisExtent: 200,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       childAspectRatio: 0.75,

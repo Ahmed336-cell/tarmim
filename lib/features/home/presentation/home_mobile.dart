@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tarmim/features/details/presentation/details_respo.dart';
 import 'package:tarmim/features/home/presentation/widgets/mobile/product_card_mobile.dart';
 
 class MobileHomePage extends StatelessWidget {
@@ -24,16 +25,7 @@ class MobileHomePage extends StatelessWidget {
                     width: 100,
                     height: 100,
                   ),
-                  InkWell(
-                    child: SvgPicture.asset(
-                      'assets/images/cart.svg',
-                      width: 40, // Adjust size
-                      height: 40,
-                    ),
-                    onTap: () {
-                      // Handle tap
-                    },
-                  ),
+
                 ],
               ),
             ),
@@ -81,6 +73,10 @@ class MobileHomePage extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: ProductCardMobile(
+                              onTap: () {
+                                // Handle tap
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsRespo()));
+                              },
                               title: 'Product Name',
                               price: '\$45.00',
                               imageUrl: 'assets/images/elicit.png', // Placeholder image

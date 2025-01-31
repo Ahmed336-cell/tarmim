@@ -8,7 +8,7 @@ class CustomButton extends StatelessWidget {
     return  MaterialButton(onPressed: onPressed,
       color: Colors.brown,
       minWidth: double.infinity,
-      height: 60,
+      height: MediaQuery.sizeOf(context).height*0.07,
       child: Text(text, style: TextStyle(color: Colors.white, fontSize: 20),),
 
     );

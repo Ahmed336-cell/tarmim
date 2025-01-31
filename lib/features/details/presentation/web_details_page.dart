@@ -2,8 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/commons/custom_button.dart';
-class ProductDetailsWeb extends StatelessWidget {
+class ProductDetailsWeb extends StatefulWidget {
   const ProductDetailsWeb({super.key});
+
+  @override
+  State<ProductDetailsWeb> createState() => _ProductDetailsWebState();
+}
+
+class _ProductDetailsWebState extends State<ProductDetailsWeb> {
+  int _quantity = 1; // Default quantity set to 1
+
+  void _increaseQuantity() {
+    setState(() {
+      _quantity++;
+    });
+  }
+
+  void _decreaseQuantity() {
+    setState(() {
+      if (_quantity > 1) {
+        _quantity--;
+      }
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +35,7 @@ class ProductDetailsWeb extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
 
-        actions: [
-          InkWell(child: SvgPicture.asset('assets/images/cart.svg' , width: 50, height: 60,),
-          onTap: (){},
-          ),
-        ],
+
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -48,14 +67,41 @@ class ProductDetailsWeb extends StatelessWidget {
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                   SizedBox(height: 8),
-                  Text(
-                    'Ramadan Notebook',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Ramadan Notebook',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Colors.brown),
+                            ),
+                            onPressed: _increaseQuantity,
+                            child: Icon(Icons.add, color: Colors.white,),
+                          ),
+                          Text(
+                            '$_quantity',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(Colors.brown),
+                            ),
+                            onPressed: _decreaseQuantity,
+                            child: Icon(Icons.remove, color: Colors.white,),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
