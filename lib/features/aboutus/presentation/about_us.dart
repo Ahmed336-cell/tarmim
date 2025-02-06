@@ -4,7 +4,7 @@ import 'package:tarmim/core/commons/custom_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsScreen extends StatelessWidget {
-  final String instagramUrl = 'https://www.instagram.com/your_business_account/';
+  final String instagramUrl = 'https://www.instagram.com/t_.tarmim/';
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();

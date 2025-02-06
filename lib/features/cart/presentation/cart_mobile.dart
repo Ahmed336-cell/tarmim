@@ -1,92 +1,129 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:tarmim/core/commons/custom_button.dart';
 import 'package:tarmim/features/cart/presentation/widgets/mobile/cartItemMobile.dart';
 import 'package:tarmim/features/cart/presentation/widgets/mobile/orderInfo.dart';
-import 'package:tarmim/features/delivery_details/presentaion/delivery_respo.dart';
+
+import '../../delivery_details/presentaion/delivery_respo.dart';
+import 'manager/cart_cubit.dart';
+import 'manager/cart_state.dart';
 
 class CartMobile extends StatelessWidget {
-  const CartMobile({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView( // FIX: Prevents overflow when keyboard appears
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Cart Items
-              SizedBox(
-                height: 300, // FIX: Set height to prevent infinite constraints
-                child: ListView(
-                  shrinkWrap: true, // FIX: Allows ListView inside Column
-                  children: [
-                    CartItemMobile(
-                      image: 'assets/images/elicit.png',
-                      title: "Ramadan Notebook",
-                      brand: 'Notebook',
-                      price: 200,
-                      quantity: 1,
-                    ),
-                    const SizedBox(height: 10),
-                    CartItemMobile(
-                      image: 'assets/images/elicit.png',
-                      title: "Men's Tie-Dye T-Shirt",
-                      brand: 'Nike Sportswear',
-                      price: 45,
-                      quantity: 1,
-                    ),
-                  ],
-                ),
-              ),
-              // Delivery Address
-               ListTile(
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryRespo()));
-                },
-                leading: Icon(Icons.location_on, color: Colors.blue),
-                title: Text('Giza, Hawamdia 2, Building 5, Floor 3'),
-                subtitle: Text('Sylhet'),
-                trailing: Icon(Icons.check_circle, color: Colors.green),
-              ),
-              const Divider(),
-              // Promo Code
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
+    // Ensure Cart Items Are Fetched
+    context.read<CartCubit>().loadCart();
 
-                      decoration: const InputDecoration(
-                        hintText: 'Enter Promo Code',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+    return Scaffold(
+      body: BlocConsumer<CartCubit, CartState>(
+        listener: (context, state) {
+          if (state is CartError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is CartLoading) {
+            return Center(child: CircularProgressIndicator());
+          } else if (state is CartLoaded) {
+            final cartCubit = context.read<CartCubit>();
+
+            // Check if Cart is Empty
+            if (state.items.isEmpty) {
+              return  Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Image.asset(
+                        "assets/images/shopping.png",
+                      width: 200,
+                      height: 200,
+                    )
                   ),
-                  const SizedBox(width: 5),
-                  Expanded( // FIX: Prevents layout issues
-                    child: CustomButton(text: 'Apply', onPressed: () {}),
-                  ),
+                  Text("Your Cart is Empty", style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),),
                 ],
-              ),
-              // Order Info
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    OrderInfoRowMobile(label: 'Subtotal', value: '110 EGP'),
-                    OrderInfoRowMobile(label: 'Shipping cost', value: '10 EGP'),
-                    OrderInfoRowMobile(label: 'Total', value: '120 EGP'),
-                  ],
+              );
+            }
+
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.items.length,
+                    itemBuilder: (context, index) {
+                      final item = state.items[index];
+                      return CartItemMobile(image: item.image,
+                          title: item.name,
+                          brand: "NoteBook",
+                          price: item.basePrice,
+                          quantity: item.quantity,
+                        increase: (){
+
+                            cartCubit.updateItemQuantity(item, item.quantity + 1);
+
+                        },
+
+                        decrease: (){
+                          if (item.quantity > 1) {
+                            cartCubit.updateItemQuantity(item, item.quantity - 1);
+                          }
+                        },
+
+                      remove: (){
+                        cartCubit.removeCartItem(item.id);
+                      },
+
+                      );
+
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              // Checkout Button
-              CustomButton(text: "Checkout", onPressed: () {}),
-            ],
-          ),
-        ),
+
+                OrderInfoRowMobile(label: "Total Price", value: "${state.totalPrice} EGP"),
+
+                Text("+ Shipping fees" , style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),),
+                // Place Order Button
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CustomButton(
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DeliveryRespo(totalPrice: state.totalPrice,))),
+                    text: "Place Order",
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return  Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                    child: Image.asset(
+                      "assets/images/shopping.png",
+                      width: 200,
+                      height: 200,
+                    )
+                ),
+                Text("Your Cart is Empty", style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),),
+              ],
+            );
+          }
+        },
       ),
     );
   }

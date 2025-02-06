@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
-class CartItemMobile extends StatelessWidget {
-  const CartItemMobile({super.key, required this.image, required this.title, required this.brand, required this.price, required this.quantity});
+class CartItemMobile extends StatefulWidget {
+  const CartItemMobile({super.key, required this.image, required this.title, required this.brand, required this.price, required this.quantity, required this.increase, required this.decrease, required this.remove});
   final String image;
   final String title;
   final String brand;
   final double price;
   final int quantity;
+  final VoidCallback increase;
+  final VoidCallback decrease;
+  final VoidCallback remove;
+
+  @override
+  State<CartItemMobile> createState() => _CartItemMobileState();
+}
+
+class _CartItemMobileState extends State<CartItemMobile> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -17,8 +26,8 @@ class CartItemMobile extends StatelessWidget {
             // Product Image
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child:  Image.asset(
-                image,
+              child:  Image.network(
+                widget.image,
                 height: 80,
                 width: 80,
                 fit: BoxFit.cover,
@@ -31,18 +40,18 @@ class CartItemMobile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    widget.title,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                   Text(
-                    brand,
+                    widget.brand,
                     style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '$price EGP',
+                    '${widget.price} EGP',
                     style: const TextStyle(color: Colors.blue),
                   ),
                 ],
@@ -52,25 +61,19 @@ class CartItemMobile extends StatelessWidget {
             Column(
               children: [
                 IconButton(
-                  onPressed: () {
-                    // Increase quantity
-                  },
+                  onPressed: widget.increase,
                   icon: const Icon(Icons.add_circle_outline),
                 ),
-                 Text(quantity.toString()),
+                 Text(widget.quantity.toString()),
                  IconButton(
-                  onPressed: () {
-                    // Decrease quantity
-                  },
+                  onPressed: widget.decrease,
                   icon: const Icon(Icons.remove_circle_outline),
                 ),
               ],
             ),
             // Remove Button
              IconButton(
-              onPressed: () {
-                // Remove item
-              },
+              onPressed:widget.remove,
               icon: const Icon(Icons.delete, color: Colors.red),
             ),
           ],

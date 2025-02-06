@@ -4,7 +4,8 @@ import 'package:tarmim/features/delivery_details/presentaion/delivery_mobile.dar
 import 'package:tarmim/features/delivery_details/presentaion/delivery_web.dart';
 
 class DeliveryRespo extends StatelessWidget {
-  const DeliveryRespo({super.key});
+  const DeliveryRespo({super.key, required this.totalPrice});
+  final double totalPrice;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class DeliveryRespo extends StatelessWidget {
         if (constraints.maxWidth > 600) {
           return Scaffold(
 
-            body: const DeliveryWeb(),
+            body:  DeliveryWeb(totalPrice: totalPrice,),
           );
         } else {
           return Scaffold(
@@ -25,7 +26,7 @@ class DeliveryRespo extends StatelessWidget {
                 style: TextStyle(fontSize: 24,color: Colors.brown, fontWeight: FontWeight.bold),
               ),
             ),
-            body:  DeliveryMobile(),
+            body:  DeliveryMobile(initialTotalPrice: totalPrice,),
           );
         }
       },

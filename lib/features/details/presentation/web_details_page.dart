@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tarmim/features/home/data/model/product.dart';
 
 import '../../../core/commons/custom_button.dart';
+
 class ProductDetailsWeb extends StatefulWidget {
-  const ProductDetailsWeb({super.key});
+  const ProductDetailsWeb({super.key, required this.product});
+  final Product product;
 
   @override
   State<ProductDetailsWeb> createState() => _ProductDetailsWebState();
@@ -11,6 +13,13 @@ class ProductDetailsWeb extends StatefulWidget {
 
 class _ProductDetailsWebState extends State<ProductDetailsWeb> {
   int _quantity = 1; // Default quantity set to 1
+  late String _selectedImage; // Track the selected image
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedImage = widget.product.product_images!.first; // Initialize with the first image
+  }
 
   void _increaseQuantity() {
     setState(() {
@@ -26,16 +35,12 @@ class _ProductDetailsWebState extends State<ProductDetailsWeb> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-
-
       ),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -48,14 +53,14 @@ class _ProductDetailsWebState extends State<ProductDetailsWeb> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
-                  'assets/images/elicit.png', // Replace with actual product image URL
+                  _selectedImage, // Display the selected image
                   fit: BoxFit.contain,
                   width: 300,
                   height: 400,
                 ),
               ),
             ),
-            SizedBox(width: 32),
+            const SizedBox(width: 32),
             // Product Details Section
             Expanded(
               flex: 1,
@@ -63,16 +68,16 @@ class _ProductDetailsWebState extends State<ProductDetailsWeb> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Notebook",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    widget.product.product_category,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Ramadan Notebook',
-                        style: TextStyle(
+                        widget.product.product_name,
+                        style: const TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                         ),
@@ -84,64 +89,82 @@ class _ProductDetailsWebState extends State<ProductDetailsWeb> {
                               backgroundColor: WidgetStateProperty.all(Colors.brown),
                             ),
                             onPressed: _increaseQuantity,
-                            child: Icon(Icons.add, color: Colors.white,),
+                            child: const Icon(Icons.add, color: Colors.white),
                           ),
                           Text(
                             '$_quantity',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           ElevatedButton(
                             style: ButtonStyle(
                               backgroundColor: WidgetStateProperty.all(Colors.brown),
                             ),
                             onPressed: _decreaseQuantity,
-                            child: Icon(Icons.remove, color: Colors.white,),
+                            child: const Icon(Icons.remove, color: Colors.white),
                           ),
                         ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Price',
                         style: TextStyle(fontSize: 18, color: Colors.black),
                       ),
                       Text(
-                        '120 EGP',
-                        style: TextStyle(
+                        '${widget.product.product_price} EGP',
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 32),
+                  const SizedBox(height: 32),
                   // Thumbnail Images
                   GridView.builder(
                     shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                     ),
-                    itemCount: 4,
+                    itemCount: widget.product.product_images?.length,
                     itemBuilder: (context, index) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'assets/images/elicit.png', // Replace with actual thumbnails
-                          fit: BoxFit.fill,
-                          width: 30,
-                          height: 30,
+                      String imageUrl = widget.product.product_images![index];
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedImage = imageUrl; // Update main image
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: _selectedImage == imageUrl ? Colors.blue : Colors.transparent,
+                              width: 3,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.fill,
+                              width: 50,
+                              height: 50,
+                            ),
+                          ),
                         ),
                       );
                     },
                   ),
-                  SizedBox(height: 16,),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Description',
                     style: TextStyle(
                       fontSize: 20,
@@ -149,12 +172,11 @@ class _ProductDetailsWebState extends State<ProductDetailsWeb> {
                     ),
                   ),
                   Text(
-                    'adasdas asdasdbaksdba asfbasblfab asaslnflasfnaf alsnfalsfnflas ',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                    widget.product.product_description,
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
                   ),
-                  SizedBox(height:24 ,),
-                  CustomButton(text: "Add to Cart", onPressed: (){})
-
+                  const SizedBox(height: 24),
+                  CustomButton(text: "Add to Cart", onPressed: () {}),
                 ],
               ),
             ),

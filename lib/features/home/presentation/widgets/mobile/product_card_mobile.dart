@@ -35,11 +35,12 @@ class ProductCardMobile extends StatelessWidget {
                 ),
                 child: Center(
                   child: ClipRRect(
-                    child: Image.asset(
+                    borderRadius: BorderRadius.circular(30),
+                    child: Image.network(
                       imageUrl,
                       fit: BoxFit.cover,
-                      height: 100,
-                      width: 100,
+                      height: 300,
+                      width: 300,
                     ),
                   ),
                 ),
@@ -65,7 +66,7 @@ class ProductCardMobile extends StatelessWidget {
                     Text(
                       price,
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Colors.grey[800],
                         fontSize: 14,
                       ),
                     ),

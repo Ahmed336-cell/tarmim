@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tarmim/core/commons/custom_button.dart';
 import 'package:tarmim/features/cart/presentation/cart_respo.dart';
+import 'package:tarmim/features/home/data/model/product.dart';
+
+import '../../cart/data/model/cart_item.dart';
+import '../../cart/presentation/manager/cart_cubit.dart';
 
 class ProductDetailsMobile extends StatefulWidget {
-  const ProductDetailsMobile({super.key});
+  const ProductDetailsMobile({super.key, required this.product});
+  final Product product;
 
   @override
   _ProductDetailsMobileState createState() => _ProductDetailsMobileState();
@@ -12,6 +18,13 @@ class ProductDetailsMobile extends StatefulWidget {
 
 class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
   int _quantity = 1; // Default quantity set to 1
+  late String _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedImage = widget.product.product_images!.first; // Initialize with the first image
+  }
 
   void _increaseQuantity() {
     setState(() {
@@ -41,10 +54,11 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                 Expanded(
                   flex: 3,
                   child: Center(
-                    child: Image.asset(
-                      'assets/images/elicit.png', // Replace with actual product image URL
-                      fit: BoxFit.cover,
-                      height: 250,
+                    child: Image.network(
+                      _selectedImage,
+                      fit: BoxFit.fill,
+                      height: 400,
+                      width: 400,
                     ),
                   ),
                 ),
@@ -53,19 +67,35 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: List.generate(
-                      4,
-                          (index) => Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            'assets/images/elicit.png', // Replace with actual thumbnail URLs
-                            fit: BoxFit.cover,
-                            width: 80,
-                            height: 80,
+                      widget.product.product_images?.length ?? 0,
+                          (index) {
+                        String imageUrl = widget.product.product_images![index];
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedImage = imageUrl;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: _selectedImage == imageUrl ? Colors.blue : Colors.transparent,
+                                width: 5,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                widget.product.product_images![index],
+                                fit: BoxFit.cover,
+                                width: 80,
+                                height: 80,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -82,7 +112,7 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Notebook",
+                          widget.product.product_category,
                           style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                         SizedBox(height: 8),
@@ -90,21 +120,20 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Ramadan Notebook',
+                              widget.product.product_name,
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-
                             Column(
                               children: [
                                 ElevatedButton(
                                   style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(Colors.brown),
+                                    backgroundColor: MaterialStateProperty.all(Colors.brown),
                                   ),
                                   onPressed: _increaseQuantity,
-                                  child: Icon(Icons.add, color: Colors.white,),
+                                  child: Icon(Icons.add, color: Colors.white),
                                 ),
                                 Text(
                                   '$_quantity',
@@ -112,10 +141,10 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                                 ),
                                 ElevatedButton(
                                   style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(Colors.brown),
+                                    backgroundColor: MaterialStateProperty.all(Colors.brown),
                                   ),
                                   onPressed: _decreaseQuantity,
-                                  child: Icon(Icons.remove, color: Colors.white,),
+                                  child: Icon(Icons.remove, color: Colors.white),
                                 ),
                               ],
                             ),
@@ -130,7 +159,7 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                               style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              '120 EGP',
+                              '${widget.product.product_price} EGP',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -141,18 +170,13 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                         SizedBox(height: 8),
                         Text(
                           'Description',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'adasdas asdasdbaksdba asfbasblfab asaslnflasfnaf alsnfalsfnflas ',
+                          widget.product.product_description,
                           style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                         SizedBox(height: 16),
-                        // Quantity Selector
-
                       ],
                     ),
                   ),
@@ -162,6 +186,15 @@ class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
                   text: "Add to Cart",
                   onPressed: () {
                     // Handle add to cart action
+                    final item = CartItem(
+                      id: widget.product.id! ,
+                      name: widget.product.product_name,
+                      image: widget.product.product_images!.first,
+                      basePrice: widget.product.product_price,
+                      quantity: _quantity,
+                    );
+                    context.read<CartCubit>().addItemToCart(item); // Adding item to the cart
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to cart')));
                   },
                 ),
               ],
