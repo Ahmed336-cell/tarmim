@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 class ProductCardMobile extends StatelessWidget {
   final String title;
@@ -36,7 +37,8 @@ class ProductCardMobile extends StatelessWidget {
                 child: Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(30),
-                    child: Image.network(
+                    child: CachedNetworkImage(
+                      imageUrl:
                       imageUrl,
                       fit: BoxFit.cover,
                       height: 300,

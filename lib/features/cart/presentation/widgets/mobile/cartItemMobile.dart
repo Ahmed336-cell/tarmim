@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 class CartItemMobile extends StatefulWidget {
   const CartItemMobile({super.key, required this.image, required this.title, required this.brand, required this.price, required this.quantity, required this.increase, required this.decrease, required this.remove});
@@ -26,8 +27,8 @@ class _CartItemMobileState extends State<CartItemMobile> {
             // Product Image
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child:  Image.network(
-                widget.image,
+              child:  CachedNetworkImage(
+                imageUrl:widget.image,
                 height: 80,
                 width: 80,
                 fit: BoxFit.cover,

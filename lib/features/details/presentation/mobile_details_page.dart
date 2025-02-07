@@ -1,206 +1,131 @@
+// UI Widget
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tarmim/core/commons/custom_button.dart';
-import 'package:tarmim/features/cart/presentation/cart_respo.dart';
-import 'package:tarmim/features/home/data/model/product.dart';
 
+import '../../../core/commons/custom_button.dart';
 import '../../cart/data/model/cart_item.dart';
 import '../../cart/presentation/manager/cart_cubit.dart';
-
-class ProductDetailsMobile extends StatefulWidget {
-  const ProductDetailsMobile({super.key, required this.product});
+import '../../home/data/model/product.dart';
+import 'manager/details_cubit.dart';
+import 'manager/details_state.dart';
+class ProductDetailsMobile extends StatelessWidget {
   final Product product;
-
-  @override
-  _ProductDetailsMobileState createState() => _ProductDetailsMobileState();
-}
-
-class _ProductDetailsMobileState extends State<ProductDetailsMobile> {
-  int _quantity = 1; // Default quantity set to 1
-  late String _selectedImage;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedImage = widget.product.product_images!.first; // Initialize with the first image
-  }
-
-  void _increaseQuantity() {
-    setState(() {
-      _quantity++;
-    });
-  }
-
-  void _decreaseQuantity() {
-    setState(() {
-      if (_quantity > 1) {
-        _quantity--;
-      }
-    });
-  }
+  const ProductDetailsMobile({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Column(
-              children: [
-                // Main Product Image
-                Expanded(
-                  flex: 3,
-                  child: Center(
-                    child: Image.network(
-                      _selectedImage,
-                      fit: BoxFit.fill,
-                      height: 400,
-                      width: 400,
-                    ),
-                  ),
-                ),
-                // Product Details Section
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(
-                      widget.product.product_images?.length ?? 0,
-                          (index) {
-                        String imageUrl = widget.product.product_images![index];
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedImage = imageUrl;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: _selectedImage == imageUrl ? Colors.blue : Colors.transparent,
-                                width: 5,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                widget.product.product_images![index],
-                                fit: BoxFit.cover,
-                                width: 80,
-                                height: 80,
-                              ),
-                            ),
+    return BlocProvider(
+      create: (context) => ProductDetailsCubit(product),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: BlocBuilder<ProductDetailsCubit, ProductDetailsState>(
+          builder: (context, state) {
+            final cubit = context.read<ProductDetailsCubit>();
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Center(
+                          child: CachedNetworkImage(
+                            imageUrl:state.selectedImage,
+                            fit: BoxFit.fill,
+                            height: 400,
+                            width: 400,
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.product.product_category,
-                          style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              widget.product.product_name,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Column(
-                              children: [
-                                ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(Colors.brown),
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: product.product_images!.map((image) {
+                            return GestureDetector(
+                              onTap: () => cubit.selectImage(image),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: state.selectedImage == image ? Colors.blue : Colors.transparent,
+                                    width: 5,
                                   ),
-                                  onPressed: _increaseQuantity,
-                                  child: Icon(Icons.add, color: Colors.white),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                Text(
-                                  '$_quantity',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child:CachedNetworkImage(imageUrl: image, fit: BoxFit.cover, width: 80, height: 80),
                                 ),
-                                ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(Colors.brown),
-                                  ),
-                                  onPressed: _decreaseQuantity,
-                                  child: Icon(Icons.remove, color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Price',
-                              style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              '${widget.product.product_price} EGP',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                          ],
+                            );
+                          }).toList(),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Description',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 16),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(product.product_category, style: TextStyle(fontSize: 16, color: Colors.black)),
+                              SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(product.product_name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                  Row(
+                                    children: [
+                                      IconButton(icon: Icon(Icons.add), onPressed: cubit.increaseQuantity),
+                                      Text('${state.quantity}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                      IconButton(icon: Icon(Icons.remove), onPressed: cubit.decreaseQuantity),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Price', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  Text('${product.product_price} EGP', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Text('Description', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              Text(product.product_description, style: TextStyle(fontSize: 16)),
+                              SizedBox(height: 16),
+                            ],
+                          ),
                         ),
-                        Text(
-                          widget.product.product_description,
-                          style: TextStyle(fontSize: 16, color: Colors.black),
-                        ),
-                        SizedBox(height: 16),
-                      ],
-                    ),
+                      ),
+                      CustomButton(
+                        text: "Add to Cart",
+                        onPressed: () {
+                          final item = CartItem(
+                            id: product.id!,
+                            name: product.product_name,
+                            image: product.product_images!.first,
+                            basePrice: product.product_price,
+                            quantity: state.quantity,
+                          );
+                          context.read<CartCubit>().addItemToCart(item);
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to cart')));
+                        },
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 16),
-                CustomButton(
-                  text: "Add to Cart",
-                  onPressed: () {
-                    // Handle add to cart action
-                    final item = CartItem(
-                      id: widget.product.id! ,
-                      name: widget.product.product_name,
-                      image: widget.product.product_images!.first,
-                      basePrice: widget.product.product_price,
-                      quantity: _quantity,
-                    );
-                    context.read<CartCubit>().addItemToCart(item); // Adding item to the cart
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to cart')));
-                  },
                 ),
               ],
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

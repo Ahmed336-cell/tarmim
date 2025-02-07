@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 class ProductCardWeb extends StatelessWidget {
   final String title;
@@ -23,8 +24,8 @@ class ProductCardWeb extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.network(
-                  imageUrl,
+                child: CachedNetworkImage(
+                 imageUrl:  imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
                 ),

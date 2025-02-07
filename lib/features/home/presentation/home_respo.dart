@@ -26,12 +26,12 @@ class HomeRespo extends StatelessWidget {
               if (constraints.maxWidth > 600) {
                 return Scaffold(
 
-                  body: const WebHomePage(),
+                  body:  WebHomePage(),
                 );
               } else {
                 return Scaffold(
 
-                  body: const MobileHomePage(),
+                  body:  MobileHomePage(),
                 );
               }
             },

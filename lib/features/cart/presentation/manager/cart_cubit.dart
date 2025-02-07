@@ -119,8 +119,6 @@ class CartCubit extends Cubit<CartState> {
           double discountedTotal = currentState.totalPrice * (1 - discountPercentage / 100);
           this.promoCode = promoCode; // Store applied promo code
           emit(CartLoaded(items: currentState.items, totalPrice: discountedTotal));
-        } else {
-          emit(CartError(message: "Invalid promo code"));
         }
       } catch (e) {
         emit(CartError(message: "Invalid promo code")); // Show specific error message

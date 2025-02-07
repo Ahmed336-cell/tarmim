@@ -11,6 +11,19 @@ class HomeCubit extends Cubit<HomeState> {
   final HomeRepo _getProductRepository;
 
   HomeCubit(this._getProductRepository) : super(ProductListInitial());
+  void searchProducts(String query) async{
+    final products = await _getProductRepository.fetchProducts();
+
+    if (query.isEmpty) {
+      emit(ProductListSuccess( products: products)); // Show all products if search is empty
+    } else {
+      final filteredProducts = products
+          .where((product) =>
+          product.product_name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+      emit(ProductListSuccess(products: filteredProducts));
+    }
+  }
 
   void fetchProducts() async {
     emit(ProductListLoading());

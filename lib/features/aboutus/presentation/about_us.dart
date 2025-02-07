@@ -4,30 +4,53 @@ import 'package:tarmim/core/commons/custom_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutUsScreen extends StatelessWidget {
-  final String instagramUrl = 'https://www.instagram.com/t_.tarmim/';
+  AboutUsScreen({Key? key}) : super(key: key);
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController problemController = TextEditingController();
+  static const String _instagramUrl = 'https://www.instagram.com/t_.tarmim/';
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _problemController = TextEditingController();
 
-  void _launchInstagram() async {
-    final Uri url = Uri.parse(instagramUrl);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      throw 'Could not launch $instagramUrl';
+  Future<void> _launchInstagram() async {
+    final Uri url = Uri.parse(_instagramUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint('Could not launch $_instagramUrl');
     }
   }
 
-  void _sendEmail() async {
-    final String email = Uri.encodeComponent(emailController.text);
-    final String subject = Uri.encodeComponent("Contact from About Us Page");
-    final String body = Uri.encodeComponent(
-        "Name: ${nameController.text}\nEmail: ${emailController.text}\nPhone: ${phoneController.text}\nProblem: ${problemController.text}");
+  Future<void> _sendEmail(BuildContext context) async {
+    if (_emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter an email address")),
+      );
+      return;
+    }
 
-    final Uri mailUrl = Uri.parse("mailto:ahmaher04@gmail.com?subject=$subject&body=$body");
+    final Uri mailUrl = Uri(
+      scheme: 'mailto',
+      path: 'ahmaher04@gmail.com',
+      queryParameters: {
+        'subject': "Contact from About Us Page",
+        'body': '''
+          Name: ${_nameController.text}
+          Email: ${_emailController.text}
+          Phone: ${_phoneController.text}
+          Problem: ${_problemController.text}
+        '''
+      },
+    );
 
-    if (!await launchUrl(mailUrl)) {
-      throw 'Could not launch email client';
+    try {
+      if (await canLaunchUrl(mailUrl)) {
+        await launchUrl(mailUrl);
+      } else {
+        debugPrint('Could not launch email client');
+      }
+    } catch (e) {
+      debugPrint('Error launching email: $e');
     }
   }
 
@@ -37,40 +60,37 @@ class AboutUsScreen extends StatelessWidget {
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: double.infinity), // Centers the form for web
-            child: Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: _launchInstagram,
-                      child: Column(
-                        children: [
-                          LineIcon.instagram(size: 100, color: Colors.purple),
-                          Text('Follow us on Instagram', style: TextStyle(fontSize: 18)),
-                        ],
-                      )
+          child: Card(
+            elevation: 5,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: _launchInstagram,
+                    child: Column(
+                      children: [
+                        LineIcon.instagram(size: 80, color: Colors.purple),
+                        const SizedBox(height: 8),
+                        const Text('Follow us on Instagram', style: TextStyle(fontSize: 18)),
+                      ],
                     ),
-                    SizedBox(height: 20),
-                    Text(
-                      'Contact Us',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    _buildTextField(nameController, 'Name'),
-                    _buildTextField(emailController, 'Email', keyboardType: TextInputType.emailAddress),
-                    _buildTextField(phoneController, 'Phone Number', keyboardType: TextInputType.phone),
-                    _buildTextField(problemController, 'Problem Description', maxLines: 3),
-                    SizedBox(height: 20),
-                    CustomButton(text: "Send", onPressed: _sendEmail),
-
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Contact Us',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildTextField(_nameController, 'Name'),
+                  _buildTextField(_emailController, 'Email', keyboardType: TextInputType.emailAddress),
+                  _buildTextField(_phoneController, 'Phone Number', keyboardType: TextInputType.phone),
+                  _buildTextField(_problemController, 'Problem Description', maxLines: 3),
+                  const SizedBox(height: 20),
+                  CustomButton(text: "Send", onPressed: () => _sendEmail(context)),
+                ],
               ),
             ),
           ),

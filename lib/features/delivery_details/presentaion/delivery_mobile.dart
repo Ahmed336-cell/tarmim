@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:country_state_city_pro/country_state_city_pro.dart';
-
+import 'package:tarmim/features/cart/presentation/cart_respo.dart';
+import 'package:tarmim/features/cart/presentation/widgets/mobile/orderInfo.dart';
 import '../../../core/commons/custom_button.dart';
 import '../../../core/commons/custom_text_field.dart';
 import '../../cart/presentation/manager/cart_cubit.dart';
 import '../../cart/presentation/manager/cart_state.dart';
 
 class DeliveryMobile extends StatelessWidget {
-  DeliveryMobile({Key? key, required this.initialTotalPrice}) : super(key: key);
   final double initialTotalPrice;
+
+  DeliveryMobile({Key? key, required this.initialTotalPrice}) : super(key: key);
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -23,91 +25,48 @@ class DeliveryMobile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Name", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              CustomTextField(maxLines: 1, label: "Name", controller: nameController),
-
               const SizedBox(height: 16),
-              spinnerAddress(),
-
+              _AddressSection(
+                nameController: nameController,
+                phoneController: phoneController,
+                emailController: emailController,
+                addressController: addressController,
+                countryController: countryController,
+                stateController: stateController,
+                cityController: cityController,
+              ),
               const SizedBox(height: 16),
-              const Text("Phone Number", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              CustomTextField(maxLines: 1, label: "01xxxxxxxxxx", controller: phoneController),
+              _PromoCodeSection(promoCodeController: promoCodeController),
               const SizedBox(height: 16),
-              const Text("Email", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              CustomTextField(label: "Email", maxLines: 1, controller: emailController),
-              const SizedBox(height: 16),
-              const Text("Address", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              CustomTextField(label: "Address", maxLines: 1, controller: addressController),
-              const SizedBox(height: 16),
-              // Promo Code Section
-              const Text("Promo Code", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              CustomTextField(label: "Enter Promo Code", maxLines: 1, controller: promoCodeController),
-              const SizedBox(height: 8),
-
-              // Order summary and confirm button
-              BlocConsumer<CartCubit, CartState>(
-                listener: (context, state) {
-                  if (state is CartError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.message)),
-                    );
-                  }
-                },
+              BlocBuilder<CartCubit, CartState>(
                 builder: (context, state) {
-                  double total;
-                  if (state is CartLoaded) {
-                    total = state.totalPrice;
-                  } else {
-                    total = initialTotalPrice;
-                  }
+                  double total = (state is CartLoaded) ? state.totalPrice : initialTotalPrice;
                   double shippingCost = context.read<CartCubit>().getShippingCost(stateController.text);
                   double finalPrice = total + shippingCost;
+                  double priceWithoutShipping = finalPrice - shippingCost;
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (promoCodeController.text.isNotEmpty) {
-                              context.read<CartCubit>().applyPromoCode(promoCodeController.text);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Please enter a promo code")),
-                              );
-                            }
-                          },
-                          child: const Text("Apply Promo Code"),
-                        ),
+                      OrderInfoRowMobile(
+                        label: "Final Price",
+                        value: stateController.text.isEmpty
+                            ? "${priceWithoutShipping.toStringAsFixed(2)} EGP"
+                            : "${finalPrice.toStringAsFixed(2)} EGP",
                       ),
                       const SizedBox(height: 16),
-                      Text("Total Price: \$${total.toStringAsFixed(2)}"),
-                      Text("Shipping: \$${shippingCost.toStringAsFixed(2)}"),
-                      Text("Final Price: \$${finalPrice.toStringAsFixed(2)}"),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: CustomButton(
-                          text: "Confirm Order",
-                          onPressed: () {
-                            if (validateFields(context)) {
-                              _showConfirmDialog(context, finalPrice);
-                            }
-                          },
-                        ),
+                      _ConfirmButton(
+                        finalPrice: finalPrice,
+                        validateFields: () => _validateFields(context),
+                        placeOrder: () => _placeOrder(context, finalPrice),
                       ),
+                      const SizedBox(height: 16),
                     ],
                   );
                 },
@@ -119,53 +78,7 @@ class DeliveryMobile extends StatelessWidget {
     );
   }
 
-  Widget spinnerAddress() {
-    return CountryStateCityPicker(
-      country: countryController,
-      state: stateController,
-      city: cityController,
-    );
-  }
-
-  void _showConfirmDialog(BuildContext context, double finalPrice) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text("Confirm Order"),
-          content: Text("Total amount to be paid: \$${finalPrice.toStringAsFixed(2)}"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<CartCubit>().updateLocation(
-                  nameController.text,
-                  countryController.text,
-                  emailController.text,
-                  stateController.text,
-                  cityController.text,
-                  addressController.text,
-                  phoneController.text,
-                );
-                context.read<CartCubit>().placeOrder();
-                Navigator.pop(dialogContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Order placed successfully!")),
-                );
-                Navigator.pop(context);
-              },
-              child: const Text("Confirm"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  bool validateFields(BuildContext context) {
+  bool _validateFields(BuildContext context) {
     if (nameController.text.isEmpty ||
         phoneController.text.isEmpty ||
         emailController.text.isEmpty ||
@@ -179,5 +92,150 @@ class DeliveryMobile extends StatelessWidget {
       return false;
     }
     return true;
+  }
+
+  void _placeOrder(BuildContext context, double finalPrice) {
+    if (_validateFields(context)) {
+      showDialog(
+        context: context,
+        builder: (context) => _ConfirmDialog(
+          finalPrice: finalPrice,
+          onConfirm: () {
+            context.read<CartCubit>().updateLocation(
+              nameController.text,
+              countryController.text,
+              emailController.text,
+              stateController.text,
+              cityController.text,
+              addressController.text,
+              phoneController.text,
+            );
+            context.read<CartCubit>().placeOrder();
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const CartRespo()));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Order placed successfully!")),
+            );
+          },
+        ),
+      );
+    }
+  }
+}
+
+/// **Reusable Address Section**
+class _AddressSection extends StatelessWidget {
+  final TextEditingController nameController;
+  final TextEditingController phoneController;
+  final TextEditingController emailController;
+  final TextEditingController addressController;
+  final TextEditingController countryController;
+  final TextEditingController stateController;
+  final TextEditingController cityController;
+
+  const _AddressSection({
+    required this.nameController,
+    required this.phoneController,
+    required this.emailController,
+    required this.addressController,
+    required this.countryController,
+    required this.stateController,
+    required this.cityController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Name", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        CustomTextField(label: "Name", controller: nameController, maxLines: 1,),
+        const SizedBox(height: 16),
+        CountryStateCityPicker(
+          country: countryController,
+          state: stateController,
+          city: cityController,
+        ),
+        const SizedBox(height: 16),
+        const Text("Phone Number", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        CustomTextField(label: "01xxxxxxxxxx", controller: phoneController, maxLines: 1,),
+        const SizedBox(height: 16),
+        const Text("Email", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        CustomTextField(label: "Email", controller: emailController, maxLines: 1,),
+        const SizedBox(height: 16),
+        const Text("Address", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        CustomTextField(label: "Address", controller: addressController, maxLines: 2,),
+      ],
+    );
+  }
+}
+
+/// **Reusable Promo Code Section**
+class _PromoCodeSection extends StatelessWidget {
+  final TextEditingController promoCodeController;
+
+  const _PromoCodeSection({required this.promoCodeController});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Promo Code", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        CustomTextField(label: "Enter Promo Code", controller: promoCodeController, maxLines: 1,),
+        const SizedBox(height: 8),
+        CustomButton(
+          onPressed: () {
+            if (promoCodeController.text.isNotEmpty) {
+              context.read<CartCubit>().applyPromoCode(promoCodeController.text);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Please enter a promo code")),
+              );
+            }
+          },
+          text: "Apply Promo Code",
+        ),
+      ],
+    );
+  }
+}
+
+/// **Reusable Confirm Order Button**
+class _ConfirmButton extends StatelessWidget {
+  final double finalPrice;
+  final VoidCallback placeOrder;
+  final bool Function() validateFields;
+
+  const _ConfirmButton({required this.finalPrice, required this.placeOrder, required this.validateFields});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomButton(
+      text: "Confirm Order",
+      onPressed: () => validateFields() ? placeOrder() : null,
+    );
+  }
+}
+
+/// **Reusable Confirm Dialog**
+class _ConfirmDialog extends StatelessWidget {
+  final double finalPrice;
+  final VoidCallback onConfirm;
+
+  const _ConfirmDialog({required this.finalPrice, required this.onConfirm});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Confirm Order"),
+      content: Text("Total amount: ${finalPrice.toStringAsFixed(2)} EGP"),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+        TextButton(onPressed: onConfirm, child: const Text("Confirm")),
+      ],
+    );
   }
 }

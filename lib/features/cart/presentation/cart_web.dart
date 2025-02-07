@@ -1,9 +1,11 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:tarmim/core/commons/custom_button.dart';
 import 'package:tarmim/features/cart/presentation/widgets/web/cart_item_web.dart';
 import 'package:tarmim/features/cart/presentation/widgets/web/order_info_web.dart';
 import 'package:tarmim/features/delivery_details/presentaion/delivery_respo.dart';
-
-import '../../../core/commons/custom_button.dart';
+import 'manager/cart_cubit.dart';
+import 'manager/cart_state.dart';
 
 class CartWeb extends StatelessWidget {
   const CartWeb({super.key});
@@ -11,126 +13,19 @@ class CartWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-
       body: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            bool isWideScreen = constraints.maxWidth > 800;
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Cart Items Section
-                Expanded(
-                  flex: 3,
-                  child: ListView(
-                    children: [
-                      CartItemWeb(
-                        image: 'assets/images/elicit.png',
-                        title: "Ramadan Notebook",
-                        brand: 'Notebook',
-                        price: 200,
-                        quantity: 1,
-                      ),
-                      CartItemWeb(
-                        image: 'assets/images/elicit.png',
-                        title: "Ramadan Notebook",
-                        brand: 'Notebook',
-                        price: 200,
-                        quantity: 1,
-                      ),
-                      const SizedBox(height: 16),
-                      CartItemWeb(
-                        image: 'assets/images/elicit.png',
-                        title: "Men's Tie-Dye T-Shirt",
-                        brand: 'Nike Sportswear',
-                        price: 45,
-                        quantity: 1,
-                      ),
-                    ],
-                  ),
-                ),
-                if (isWideScreen) const SizedBox(width: 24),
-                // Summary Section
-                Expanded(
-                  flex: isWideScreen ? 2 : 3,
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          blurRadius: 8.0,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Delivery Address
-                         ListTile(
-                          onTap: (){
-                            // Navigator.push(context, MaterialPageRoute(builder: (context) => const DeliveryRespo()));
-                          },
-                          leading: Icon(
-                              Icons.location_on, color: Colors.blue, size: 28),
-                          title: Text(
-                            'Giza, Hawamdia 2, Building 5, Floor 3',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                              'Egypt', style: TextStyle(fontSize: 16)),
-                          trailing: Icon(
-                              Icons.check_circle, color: Colors.green),
-                        ),
-                        const Divider(height: 24),
-                        // Payment Method
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-
-                                decoration: const InputDecoration(
-                                  hintText: 'Enter Promo Code',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Expanded( // FIX: Prevents layout issues
-                              child: CustomButton(text: 'Apply', onPressed: () {}),
-                            ),
-                          ],
-                        ),
-                        // Order Info
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              OrderInfoRowWeb(
-                                  label: 'Subtotal', value: '110 EGP'),
-                              OrderInfoRowWeb(
-                                  label: 'Shipping cost', value: '10 EGP'),
-                              OrderInfoRowWeb(label: 'Total', value: '120 EGP'),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        // Checkout Button
-                        CustomButton(text: "Checkout", onPressed: () {})
-
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
+        child: BlocBuilder<CartCubit, CartState>(
+          builder: (context, state) {
+            if (state is CartLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is CartLoaded) {
+              return state.items.isEmpty
+                  ? const _EmptyCartView()
+                  : _CartContent(state: state);
+            } else {
+              return const _EmptyCartView();
+            }
           },
         ),
       ),
@@ -138,3 +33,124 @@ class CartWeb extends StatelessWidget {
   }
 }
 
+class _EmptyCartView extends StatelessWidget {
+  const _EmptyCartView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            "assets/images/shopping.png",
+            width: 200,
+            height: 200,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            "Your Cart is Empty",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CartContent extends StatelessWidget {
+  final CartLoaded state;
+
+  const _CartContent({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final cartCubit = context.read<CartCubit>();
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isWideScreen = constraints.maxWidth > 800;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: ListView.builder(
+                itemCount: state.items.length,
+                itemBuilder: (context, index) {
+                  final item = state.items[index];
+                  return CartItemWeb(
+                    image: item.image,
+                    title: item.name,
+                    brand: "NoteBook",
+                    price: item.basePrice,
+                    quantity: item.quantity,
+                    increase: () => cartCubit.updateItemQuantity(item, item.quantity + 1),
+                    decrease: () {
+                      if (item.quantity > 1) {
+                        cartCubit.updateItemQuantity(item, item.quantity - 1);
+                      }
+                    },
+                    remove: () => cartCubit.removeCartItem(item.id),
+                  );
+                },
+              ),
+            ),
+            if (isWideScreen) const SizedBox(width: 24),
+            Expanded(
+              flex: isWideScreen ? 2 : 3,
+              child: _OrderSummary(state: state),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _OrderSummary extends StatelessWidget {
+  final CartLoaded state;
+
+  const _OrderSummary({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 8.0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OrderInfoRowWeb(
+            label: 'Total Price',
+            value: "${state.totalPrice} EGP",
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "+ Shipping fees",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 24),
+          CustomButton(
+            text: "Place Order",
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DeliveryRespo(totalPrice: state.totalPrice),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
