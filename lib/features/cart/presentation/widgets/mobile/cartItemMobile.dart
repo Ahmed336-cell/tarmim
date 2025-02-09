@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class CartItemMobile extends StatefulWidget {
   const CartItemMobile({super.key, required this.image, required this.title, required this.brand, required this.price, required this.quantity, required this.increase, required this.decrease, required this.remove});
   final String image;
@@ -52,7 +54,7 @@ class _CartItemMobileState extends State<CartItemMobile> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${widget.price} EGP',
+                    '${widget.price} ${AppLocalizations.of(context)!.egp}',
                     style: const TextStyle(color: Colors.blue),
                   ),
                 ],

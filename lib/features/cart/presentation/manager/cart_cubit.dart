@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/model/cart_item.dart';
 import '../../data/repo/cart_repo.dart';
 import 'cart_state.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class CartCubit extends Cubit<CartState> {
   final CartRepository cartRepository;
@@ -16,31 +19,31 @@ class CartCubit extends Cubit<CartState> {
   String? email;
   String promoCode="";
 
-  Future<void> loadCart() async {
+  Future<void> loadCart(BuildContext context) async {
     emit(CartLoading());
     try {
       final items = await cartRepository.fetchCartItems();
       double total = items.fold(0, (sum, item) => sum + item.totalPrice);
       emit(CartLoaded(items: items, totalPrice: total));
     } catch (e) {
-      emit(CartError(message: "Failed to load cart"));
+      emit(CartError(message: AppLocalizations.of(context)!.faildToLoadcart));
     }
   }
 
-  Future<void> updateItemQuantity(CartItem item, int quantity) async {
+  Future<void> updateItemQuantity(CartItem item, int quantity, BuildContext context) async {
     item.quantity = quantity;
     await cartRepository.updateCartItem(item);
-    loadCart(); // Refresh cart
+    loadCart(context); // Refresh cart
   }
 
-  Future<void> removeCartItem(int id) async {
+  Future<void> removeCartItem(int id, BuildContext context) async {
     await cartRepository.removeCartItem(id);
-    loadCart();
+    loadCart(context);
   }
 
 
 
-  Future<void> addItemToCart(CartItem item) async {
+  Future<void> addItemToCart(CartItem item , BuildContext context) async {
     if (state is CartLoaded) {
       final currentState = state as CartLoaded;
       List<CartItem> updatedCart = List.from(currentState.items);
@@ -60,7 +63,7 @@ class CartCubit extends Cubit<CartState> {
         double total = updatedCart.fold(0, (sum, item) => sum + item.totalPrice);
         emit(CartLoaded(items: updatedCart, totalPrice: total));
       } catch (e) {
-        emit(CartError(message: "Failed to add item to cart"));
+        emit(CartError(message: AppLocalizations.of(context)!.faildToAddToCart));
       }
     }
   }
@@ -109,7 +112,7 @@ class CartCubit extends Cubit<CartState> {
     return shippingCosts[gov] ?? 100.0; // Default shipping cost if state is unknown
   }
 
-  Future<void> applyPromoCode(String promoCode) async {
+  Future<void> applyPromoCode(String promoCode,BuildContext context) async {
     if (state is CartLoaded) {
       final currentState = state as CartLoaded;
       try {
@@ -121,13 +124,13 @@ class CartCubit extends Cubit<CartState> {
           emit(CartLoaded(items: currentState.items, totalPrice: discountedTotal));
         }
       } catch (e) {
-        emit(CartError(message: "Invalid promo code")); // Show specific error message
+        emit(CartError(message: AppLocalizations.of(context)!.invalidPromoCode)); // Show specific error message
       }
     }
   }
-  Future<void> placeOrder() async {
+  Future<void> placeOrder(BuildContext context) async {
     if ([name, country, gov, city, address, phoneNumber, email].contains(null)) {
-      emit(CartError(message: "Please fill in all required fields before placing an order"));
+      emit(CartError(message: AppLocalizations.of(context)!.pleasFill));
       return;
     }
 
@@ -163,7 +166,7 @@ class CartCubit extends Cubit<CartState> {
 
         emit(CartLoaded(items: [], totalPrice: 0)); // Clear cart
       } catch (e) {
-        emit(CartError(message: "Failed to place order. Please try again later."));
+        emit(CartError(message: AppLocalizations.of(context)!.faildToPlaceOrder));
       }
     }
   }}

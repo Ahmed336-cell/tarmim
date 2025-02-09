@@ -3,6 +3,7 @@ import 'package:tarmim/constants.dart';
 import 'package:tarmim/features/details/presentation/mobile_details_page.dart';
 import 'package:tarmim/features/details/presentation/web_details_page.dart';
 import 'package:tarmim/features/home/data/model/product.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DetailsRespo extends StatelessWidget {
   const DetailsRespo({super.key, required this.product});
@@ -22,8 +23,8 @@ class DetailsRespo extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: Color(Constant.color),
               centerTitle: true,
-              title: const Text(
-                'Details',
+              title:  Text(
+                AppLocalizations.of(context)!.details,
                 style: TextStyle(fontSize: 24,color: Colors.brown, fontWeight: FontWeight.bold),
               ),
             ),

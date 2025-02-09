@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:tarmim/features/aboutus/presentation/about_us.dart';
 import '../../constants.dart';
 import '../cart/presentation/cart_respo.dart';
 import '../home/presentation/home_respo.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'manager/language_cubit.dart';
 
 class MainMobile extends StatefulWidget {
   const MainMobile({Key? key}) : super(key: key);
@@ -21,7 +25,6 @@ class _MainMobileState extends State<MainMobile> {
     AboutUsScreen(),
   ];
 
-  final List<String> _titles = ['Home', 'Cart', 'About Us'];
 
   @override
   void dispose() {
@@ -31,6 +34,8 @@ class _MainMobileState extends State<MainMobile> {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> _titles = [AppLocalizations.of(context)!.home, AppLocalizations.of(context)!.cart, AppLocalizations.of(context)!.about];
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -49,6 +54,9 @@ class _MainMobileState extends State<MainMobile> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              actions: [
+                _buildLanguageToggle(),
+              ],
             );
           },
         ),
@@ -88,18 +96,18 @@ class _MainMobileState extends State<MainMobile> {
                   duration: const Duration(milliseconds: 100),
                   tabBackgroundColor: Color(Constant.color),
                   color: Colors.black,
-                  tabs: const [
+                  tabs:  [
                     GButton(
                       icon: LineIcons.home,
-                      text: 'Home',
+                      text: AppLocalizations.of(context)!.home,
                     ),
                     GButton(
                       icon: LineIcons.shoppingCart,
-                      text: 'Cart',
+                      text: AppLocalizations.of(context)!.cart,
                     ),
                     GButton(
                       icon: LineIcons.infoCircle,
-                      text: 'About Us',
+                      text: AppLocalizations.of(context)!.about,
                     ),
                   ],
                   selectedIndex: index,
@@ -112,6 +120,29 @@ class _MainMobileState extends State<MainMobile> {
           ),
         ),
       ),
+    );
+
+  }
+
+  Widget _buildLanguageToggle() {
+    return BlocBuilder<LanguageCubit, Locale>(
+      builder: (context, locale) {
+        return
+          InkWell(
+              onTap: (){
+                context.read<LanguageCubit>().toggleLanguage();
+
+              },
+              child: Image.asset(
+                locale.languageCode == 'en'
+                    ? 'assets/images/ain.png'
+                    : 'assets/images/english.png',
+                width: 30,
+                height: 30,
+                fit: BoxFit.contain,
+              )
+          );
+      },
     );
   }
 }

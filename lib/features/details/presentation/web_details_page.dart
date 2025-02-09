@@ -7,6 +7,7 @@ import '../../cart/presentation/manager/cart_cubit.dart';
 import '../../home/data/model/product.dart';
 import 'manager/details_cubit.dart';
 import 'manager/details_state.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProductDetailsWeb extends StatelessWidget {
   const ProductDetailsWeb({super.key, required this.product});
@@ -58,8 +59,8 @@ class ProductDetailsWeb extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Price', style: TextStyle(fontSize: 18, color: Colors.black)),
-                            Text('${state.product.product_price} EGP', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                             Text(AppLocalizations.of(context)!.price, style: TextStyle(fontSize: 18, color: Colors.black)),
+                            Text('${state.product.product_price} ${AppLocalizations.of(context)!.egp}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                           ],
                         ),
                         const SizedBox(height: 32),
@@ -85,11 +86,11 @@ class ProductDetailsWeb extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 16),
-                        const Text('Description', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                         Text(AppLocalizations.of(context)!.description, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                         Text(state.product.product_description, style: const TextStyle(fontSize: 16, color: Colors.black)),
                         const SizedBox(height: 24),
                         CustomButton(
-                          text: "Add to Cart",
+                          text: AppLocalizations.of(context)!.addCart,
                           onPressed: () {
                             final item = CartItem(
                               id: state.product.id!,
@@ -98,8 +99,8 @@ class ProductDetailsWeb extends StatelessWidget {
                               basePrice: state.product.product_price,
                               quantity: state.quantity,
                             );
-                            context.read<CartCubit>().addItemToCart(item);
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to cart')));
+                            context.read<CartCubit>().addItemToCart(item,context);
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.addedToCart)));
                           },
                         ),
                       ],

@@ -6,6 +6,7 @@ import 'package:tarmim/features/home/data/model/product.dart';
 import 'package:tarmim/features/home/presentation/manager/home_cubit.dart';
 import 'package:tarmim/features/home/presentation/manager/home_state.dart';
 import 'package:tarmim/features/home/presentation/widgets/mobile/product_card_mobile.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MobileHomePage extends StatelessWidget {
   MobileHomePage({super.key});
@@ -36,7 +37,7 @@ class MobileHomePage extends StatelessWidget {
                 controller: _searchController,
                 onChanged: (query) => context.read<HomeCubit>().searchProducts(query),
                 decoration: InputDecoration(
-                  hintText: 'Search...',
+                  hintText: AppLocalizations.of(context)!.search,
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25.0),
@@ -98,7 +99,7 @@ class MobileHomePage extends StatelessWidget {
               );
             },
             title: product.product_name,
-            price: '${product.product_price} EGP',
+            price: '${product.product_price} ${AppLocalizations.of(context)!.egp}',
             imageUrl: product.product_images!.first,
             backgroundColor: Colors.blue.shade900,
           );

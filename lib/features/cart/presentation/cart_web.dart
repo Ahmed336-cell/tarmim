@@ -6,6 +6,7 @@ import 'package:tarmim/features/cart/presentation/widgets/web/order_info_web.dar
 import 'package:tarmim/features/delivery_details/presentaion/delivery_respo.dart';
 import 'manager/cart_cubit.dart';
 import 'manager/cart_state.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CartWeb extends StatelessWidget {
   const CartWeb({super.key});
@@ -48,8 +49,8 @@ class _EmptyCartView extends StatelessWidget {
             height: 200,
           ),
           const SizedBox(height: 16),
-          const Text(
-            "Your Cart is Empty",
+           Text(
+             AppLocalizations.of(context)!.emptyCart ,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ],
@@ -84,13 +85,13 @@ class _CartContent extends StatelessWidget {
                     brand: "NoteBook",
                     price: item.basePrice,
                     quantity: item.quantity,
-                    increase: () => cartCubit.updateItemQuantity(item, item.quantity + 1),
+                    increase: () => cartCubit.updateItemQuantity(item, item.quantity + 1,context),
                     decrease: () {
                       if (item.quantity > 1) {
-                        cartCubit.updateItemQuantity(item, item.quantity - 1);
+                        cartCubit.updateItemQuantity(item, item.quantity - 1,context);
                       }
                     },
-                    remove: () => cartCubit.removeCartItem(item.id),
+                    remove: () => cartCubit.removeCartItem(item.id,context),
                   );
                 },
               ),
@@ -131,17 +132,17 @@ class _OrderSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OrderInfoRowWeb(
-            label: 'Total Price',
-            value: "${state.totalPrice} EGP",
+            label: AppLocalizations.of(context)!.totalPrice,
+            value: "${state.totalPrice} ${AppLocalizations.of(context)!.egp}",
           ),
           const SizedBox(height: 8),
-          const Text(
-            "+ Shipping fees",
+           Text(
+            "+ ${AppLocalizations.of(context)!.shippingFees}",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
           CustomButton(
-            text: "Place Order",
+            text: AppLocalizations.of(context)!.placeOrder,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(

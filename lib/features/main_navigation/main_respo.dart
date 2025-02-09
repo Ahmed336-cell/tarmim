@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tarmim/core/commons/custom_button.dart';
 import 'package:tarmim/features/main_navigation/main_mobile.dart';
 import 'package:tarmim/features/main_navigation/main_web.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'manager/language_cubit.dart';
 import 'manager/main_cubit.dart';
 
 class MainRespo extends StatelessWidget {
@@ -11,16 +13,22 @@ class MainRespo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ConnectivityCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ConnectivityCubit()),
+      ],
       child: BlocBuilder<ConnectivityCubit, bool>(
         builder: (context, isConnected) {
           if (!isConnected) {
             return _buildNoInternetScreen(context);
           }
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              return constraints.maxWidth > 600 ? const MainWeb() : const MainMobile();
+          return BlocBuilder<LanguageCubit, Locale>(
+            builder: (context, locale) {
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return constraints.maxWidth > 600 ? const MainLayout() : const MainMobile();
+                },
+              );
             },
           );
         },
@@ -38,16 +46,16 @@ class MainRespo extends StatelessWidget {
             const Icon(Icons.wifi_off, size: 80, color: Colors.red),
             const SizedBox(height: 20),
             Image.asset("assets/images/internet.jpg", height: 200),
-            const Text(
-              "No Internet Connection",
+             Text(
+              AppLocalizations.of(context)!.noInternetConnection,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: CustomButton(
-                onPressed: () => context.read<ConnectivityCubit>().checkConnection(), // ✅ Fixed this
-                text: "Retry",
+                onPressed: () => context.read<ConnectivityCubit>().checkConnection(),
+                text: AppLocalizations.of(context)!.retry,
               ),
             ),
           ],

@@ -49,10 +49,14 @@ dependencies:
   skeletonizer: ^1.4.3
   cached_network_image: ^3.4.1
   connectivity_plus: ^6.1.3
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -71,6 +75,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true
 
   # To add assets to your application, add an assets section, like this:
   assets:
@@ -104,3 +109,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_intl:
+  enabled: true
+  l10n:
+    arb-dir: lib/l10n
+    template-arb-file: intl_en.arb
+    output-localization-file: app_localizations.dart
+
+

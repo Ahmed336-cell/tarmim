@@ -6,11 +6,12 @@ import 'package:tarmim/features/cart/presentation/widgets/mobile/orderInfo.dart'
 import '../../delivery_details/presentaion/delivery_respo.dart';
 import 'manager/cart_cubit.dart';
 import 'manager/cart_state.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CartMobile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    context.read<CartCubit>().loadCart();
+    context.read<CartCubit>().loadCart(context);
 
     return Scaffold(
       body: BlocBuilder<CartCubit, CartState>(
@@ -21,7 +22,7 @@ class CartMobile extends StatelessWidget {
             final cartCubit = context.read<CartCubit>();
 
             if (state.items.isEmpty) {
-              return _buildEmptyCart();
+              return _buildEmptyCart(context);
             }
 
             return Column(
@@ -37,21 +38,21 @@ class CartMobile extends StatelessWidget {
                         brand: "NoteBook",
                         price: item.basePrice,
                         quantity: item.quantity,
-                        increase: () => cartCubit.updateItemQuantity(item, item.quantity + 1),
+                        increase: () => cartCubit.updateItemQuantity(item, item.quantity + 1,context),
                         decrease: () {
                           if (item.quantity > 1) {
-                            cartCubit.updateItemQuantity(item, item.quantity - 1);
+                            cartCubit.updateItemQuantity(item, item.quantity - 1,context);
                           }
                         },
-                        remove: () => cartCubit.removeCartItem(item.id),
+                        remove: () => cartCubit.removeCartItem(item.id,context),
                       );
                     },
                   ),
                 ),
-                OrderInfoRowMobile(label: "Total Price", value: "${state.totalPrice} EGP"),
+                OrderInfoRowMobile(label:AppLocalizations.of(context)!.totalPrice, value: "${state.totalPrice} ${AppLocalizations.of(context)!.egp}"),
                 SizedBox(height: 8),
                 Text(
-                  "+ Shipping fees",
+                  "+ ${AppLocalizations.of(context)!.shippingFees}",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
@@ -64,19 +65,19 @@ class CartMobile extends StatelessWidget {
                         builder: (context) => DeliveryRespo(totalPrice: state.totalPrice),
                       ),
                     ),
-                    text: "Place Order",
+                    text: AppLocalizations.of(context)!.placeOrder,
                   ),
                 ),
               ],
             );
           }
-          return _buildEmptyCart();
+          return _buildEmptyCart(context);
         },
       ),
     );
   }
 
-  Widget _buildEmptyCart() {
+  Widget _buildEmptyCart(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -84,7 +85,7 @@ class CartMobile extends StatelessWidget {
           Image.asset("assets/images/shopping.png", width: 200, height: 200),
           SizedBox(height: 16),
           Text(
-            "Your Cart is Empty",
+            AppLocalizations.of(context)!.emptyCart,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ],

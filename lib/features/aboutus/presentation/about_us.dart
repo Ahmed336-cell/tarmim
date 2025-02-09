@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:line_icons/line_icon.dart';
 import 'package:tarmim/core/commons/custom_button.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AboutUsScreen extends StatelessWidget {
   AboutUsScreen({Key? key}) : super(key: key);
@@ -74,22 +75,22 @@ class AboutUsScreen extends StatelessWidget {
                       children: [
                         LineIcon.instagram(size: 80, color: Colors.purple),
                         const SizedBox(height: 8),
-                        const Text('Follow us on Instagram', style: TextStyle(fontSize: 18)),
+                         Text(AppLocalizations.of(context)!.followUs, style: TextStyle(fontSize: 18)),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Contact Us',
+                   Text(
+                     AppLocalizations.of(context)!.contact,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  _buildTextField(_nameController, 'Name'),
-                  _buildTextField(_emailController, 'Email', keyboardType: TextInputType.emailAddress),
-                  _buildTextField(_phoneController, 'Phone Number', keyboardType: TextInputType.phone),
-                  _buildTextField(_problemController, 'Problem Description', maxLines: 3),
+                  _buildTextField(_nameController, AppLocalizations.of(context)!.name),
+                  _buildTextField(_emailController, AppLocalizations.of(context)!.email, keyboardType: TextInputType.emailAddress),
+                  _buildTextField(_phoneController,AppLocalizations.of(context)!.phone, keyboardType: TextInputType.phone),
+                  _buildTextField(_problemController, AppLocalizations.of(context)!.problemDes, maxLines: 3),
                   const SizedBox(height: 20),
-                  CustomButton(text: "Send", onPressed: () => _sendEmail(context)),
+                  CustomButton(text: AppLocalizations.of(context)!.send, onPressed: () => _sendEmail(context)),
                 ],
               ),
             ),

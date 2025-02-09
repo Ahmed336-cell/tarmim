@@ -9,6 +9,8 @@ import '../../cart/presentation/manager/cart_cubit.dart';
 import '../../home/data/model/product.dart';
 import 'manager/details_cubit.dart';
 import 'manager/details_state.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class ProductDetailsMobile extends StatelessWidget {
   final Product product;
   const ProductDetailsMobile({super.key, required this.product});
@@ -93,12 +95,12 @@ class ProductDetailsMobile extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Price', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                  Text('${product.product_price} EGP', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                  Text(AppLocalizations.of(context)!.price, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                  Text('${product.product_price} ${AppLocalizations.of(context)!.egp}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                                 ],
                               ),
                               SizedBox(height: 8),
-                              Text('Description', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              Text(AppLocalizations.of(context)!.description, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                               Text(product.product_description, style: TextStyle(fontSize: 16)),
                               SizedBox(height: 16),
                             ],
@@ -106,7 +108,7 @@ class ProductDetailsMobile extends StatelessWidget {
                         ),
                       ),
                       CustomButton(
-                        text: "Add to Cart",
+                        text: AppLocalizations.of(context)!.addCart,
                         onPressed: () {
                           final item = CartItem(
                             id: product.id!,
@@ -115,8 +117,8 @@ class ProductDetailsMobile extends StatelessWidget {
                             basePrice: product.product_price,
                             quantity: state.quantity,
                           );
-                          context.read<CartCubit>().addItemToCart(item);
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to cart')));
+                          context.read<CartCubit>().addItemToCart(item,context);
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.addedToCart)));
                         },
                       ),
                     ],

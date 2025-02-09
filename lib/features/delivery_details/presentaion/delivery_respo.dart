@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tarmim/constants.dart';
 import 'package:tarmim/features/delivery_details/presentaion/delivery_mobile.dart';
 import 'package:tarmim/features/delivery_details/presentaion/delivery_web.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DeliveryRespo extends StatelessWidget {
   const DeliveryRespo({super.key, required this.totalPrice});
@@ -21,8 +22,8 @@ class DeliveryRespo extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: Color(Constant.color),
               centerTitle: true,
-              title: const Text(
-                'Address',
+              title:  Text(
+                AppLocalizations.of(context)!.address,
                 style: TextStyle(fontSize: 24,color: Colors.brown, fontWeight: FontWeight.bold),
               ),
             ),

@@ -7,6 +7,7 @@ import '../../../core/commons/custom_button.dart';
 import '../../../core/commons/custom_text_field.dart';
 import '../../cart/presentation/manager/cart_cubit.dart';
 import '../../cart/presentation/manager/cart_state.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DeliveryMobile extends StatelessWidget {
   final double initialTotalPrice;
@@ -55,10 +56,10 @@ class DeliveryMobile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       OrderInfoRowMobile(
-                        label: "Final Price",
+                        label: AppLocalizations.of(context)!.finalPrice,
                         value: stateController.text.isEmpty
-                            ? "${priceWithoutShipping.toStringAsFixed(2)} EGP"
-                            : "${finalPrice.toStringAsFixed(2)} EGP",
+                            ? "${priceWithoutShipping.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}"
+                            : "${finalPrice.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}",
                       ),
                       const SizedBox(height: 16),
                       _ConfirmButton(
@@ -87,7 +88,7 @@ class DeliveryMobile extends StatelessWidget {
         stateController.text.isEmpty ||
         cityController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields")),
+         SnackBar(content: Text(AppLocalizations.of(context)!.pleasFill)),
       );
       return false;
     }
@@ -110,11 +111,10 @@ class DeliveryMobile extends StatelessWidget {
               addressController.text,
               phoneController.text,
             );
-            context.read<CartCubit>().placeOrder();
+            context.read<CartCubit>().placeOrder(context);
             Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const CartRespo()));
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Order placed successfully!")),
+               SnackBar(content: Text(AppLocalizations.of(context)!.orderPlacedSuccessfully)),
             );
           },
         ),
@@ -148,9 +148,9 @@ class _AddressSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Name", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+         Text(AppLocalizations.of(context)!.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        CustomTextField(label: "Name", controller: nameController, maxLines: 1,),
+        CustomTextField(label: AppLocalizations.of(context)!.name, controller: nameController, maxLines: 1,),
         const SizedBox(height: 16),
         CountryStateCityPicker(
           country: countryController,
@@ -158,14 +158,14 @@ class _AddressSection extends StatelessWidget {
           city: cityController,
         ),
         const SizedBox(height: 16),
-        const Text("Phone Number", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+         Text(AppLocalizations.of(context)!.phone, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         CustomTextField(label: "01xxxxxxxxxx", controller: phoneController, maxLines: 1,),
         const SizedBox(height: 16),
-        const Text("Email", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        CustomTextField(label: "Email", controller: emailController, maxLines: 1,),
+         Text(AppLocalizations.of(context)!.email, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        CustomTextField(label: AppLocalizations.of(context)!.email, controller: emailController, maxLines: 1,),
         const SizedBox(height: 16),
-        const Text("Address", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        CustomTextField(label: "Address", controller: addressController, maxLines: 2,),
+         Text(AppLocalizations.of(context)!.address, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        CustomTextField(label: AppLocalizations.of(context)!.address, controller: addressController, maxLines: 2,),
       ],
     );
   }
@@ -182,21 +182,21 @@ class _PromoCodeSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Promo Code", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+         Text(AppLocalizations.of(context)!.promoCode, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        CustomTextField(label: "Enter Promo Code", controller: promoCodeController, maxLines: 1,),
+        CustomTextField(label: AppLocalizations.of(context)!.enterPromoCode, controller: promoCodeController, maxLines: 1,),
         const SizedBox(height: 8),
         CustomButton(
           onPressed: () {
             if (promoCodeController.text.isNotEmpty) {
-              context.read<CartCubit>().applyPromoCode(promoCodeController.text);
+              context.read<CartCubit>().applyPromoCode(promoCodeController.text,context);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Please enter a promo code")),
+                 SnackBar(content: Text(AppLocalizations.of(context)!.pleaseEnterPromoCode)),
               );
             }
           },
-          text: "Apply Promo Code",
+          text:AppLocalizations.of(context)!.applyPromoCode,
         ),
       ],
     );
@@ -214,7 +214,7 @@ class _ConfirmButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomButton(
-      text: "Confirm Order",
+      text: AppLocalizations.of(context)!.confirmOrder,
       onPressed: () => validateFields() ? placeOrder() : null,
     );
   }
@@ -230,11 +230,11 @@ class _ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Confirm Order"),
-      content: Text("Total amount: ${finalPrice.toStringAsFixed(2)} EGP"),
+      title:  Text(AppLocalizations.of(context)!.confirmOrder),
+      content: Text("${AppLocalizations.of(context)!.totalamount} ${finalPrice.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}"),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-        TextButton(onPressed: onConfirm, child: const Text("Confirm")),
+        TextButton(onPressed: () => Navigator.pop(context), child:  Text(AppLocalizations.of(context)!.cancel)),
+        TextButton(onPressed: onConfirm, child:  Text(AppLocalizations.of(context)!.confirm))
       ],
     );
   }

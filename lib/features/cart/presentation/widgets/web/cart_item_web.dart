@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CartItemWeb extends StatelessWidget {
   const CartItemWeb({super.key, required this.image, required this.title, required this.brand, required this.price, required this.quantity, required this.increase, required this.decrease, required this.remove});
@@ -50,7 +51,7 @@ class CartItemWeb extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '$price EGP',
+                    '$price ${AppLocalizations.of(context)!.egp}',
                     style: const TextStyle(color: Colors.blue, fontSize: 16),
                   ),
                 ],
