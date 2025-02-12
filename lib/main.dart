@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:tarmim/bloc_observer.dart';
 import 'package:tarmim/features/cart/data/repo/cart_repo.dart';
 import 'package:tarmim/features/cart/presentation/cart_respo.dart';
@@ -18,17 +19,24 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'constants.dart';
 import 'features/cart/presentation/manager/cart_state.dart';
 import 'features/main_navigation/manager/language_cubit.dart';
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer= Observe();
+  Bloc.observer = Observe(); // Your Bloc observer
+
   await Supabase.initialize(
     url: Constant.url,
     anonKey: Constant.apiKay,
   );
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-  .then((value)=>runApp(
- MyApp(), // Wrap your app
-  )
+
+  await SentryFlutter.init(
+        (options) {
+      options.dsn = Constant.sentryKey;
+      options.tracesSampleRate = 1.0; // Adjust for performance monitoring
+    },
+    appRunner: () {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+          .then((_) => runApp(MyApp()));
+    },
   );
 }
 
