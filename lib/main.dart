@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tarmim/bloc_observer.dart';
 import 'package:tarmim/features/cart/data/repo/cart_repo.dart';
 import 'package:tarmim/features/cart/presentation/cart_respo.dart';
 import 'package:tarmim/features/cart/presentation/manager/cart_cubit.dart';
@@ -19,6 +20,7 @@ import 'features/cart/presentation/manager/cart_state.dart';
 import 'features/main_navigation/manager/language_cubit.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer= Observe();
   await Supabase.initialize(
     url: Constant.url,
     anonKey: Constant.apiKay,
