@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/commons/custom_button.dart';
 import '../../cart/data/model/cart_item.dart';
+import '../../cart/presentation/cart_respo.dart';
 import '../../cart/presentation/manager/cart_cubit.dart';
 import '../../home/data/model/product.dart';
 import 'manager/details_cubit.dart';
@@ -100,8 +101,11 @@ class ProductDetailsWeb extends StatelessWidget {
                               quantity: state.quantity,
                             );
                             context.read<CartCubit>().addItemToCart(item,context);
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.addedToCart)));
-                          },
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.addedToCart),
+                              action: SnackBarAction(label: AppLocalizations.of(context)!.cart, onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => CartRespo(),));
+                              },),
+                            ));                          },
                         ),
                       ],
                     ),

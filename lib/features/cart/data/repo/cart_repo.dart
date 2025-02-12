@@ -79,20 +79,6 @@ class CartRepository {
         .single();
   }
 
-  Future<double> getLocationBasedPrice(double basePrice, String country, String state, String city) async {
-    final response = await supabase
-        .from('location_pricing')
-        .select()
-        .eq('country', country)
-        .eq('state', state)
-        .eq('city', city)
-        .single();
-
-    if (response != null) {
-      return basePrice * response['multiplier'].toDouble(); // Example: Different price multipliers for locations
-    }
-    return basePrice; // Default if location not found
-  }
 
   Future<void> addCartItem(CartItem item) async {
     int index = _cartItems.indexWhere((cartItem) => cartItem.id == item.id);

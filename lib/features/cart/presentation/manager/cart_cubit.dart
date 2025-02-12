@@ -69,17 +69,16 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<void> updateLocation(
-      String name,         // <-- accept name from UI
+      String name,
       String country,
       String email,
       String gov,
       String city,
       String address,
-      String phoneNumber
-      ) async {
+      String phoneNumber) async {
+
     this.name = name;
     this.country = country;
-    this.gov = gov;
     this.city = city;
     this.address = address;
     this.phoneNumber = phoneNumber;
@@ -87,30 +86,66 @@ class CartCubit extends Cubit<CartState> {
 
     if (state is CartLoaded) {
       final currentState = state as CartLoaded;
-      double total = 0;
-      for (var item in currentState.items) {
-        total += await cartRepository.getLocationBasedPrice(
-          item.basePrice,
-          country,
-          gov,
-          city,
-        ) * item.quantity;
+
+      double itemsTotal = currentState.items.fold(0, (sum, item) => sum + item.basePrice);
+
+      this.gov = gov;
+
+      double newShippingCost = getShippingCost(gov);
+
+      if (currentState.totalPrice == itemsTotal + newShippingCost) {
+        return;
       }
-      emit(CartLoaded(items: currentState.items, totalPrice: total));
+
+      double newTotal = itemsTotal + newShippingCost;
+
+
+
+      emit(CartLoaded(items: currentState.items, totalPrice: newTotal));
     }
   }
+
+
+
+
   /// Returns the shipping cost based on the state/governorate.
-  double getShippingCost(String gov) {
+  double getShippingCost(String? gov) {
+
+
     Map<String, double> shippingCosts = {
-      "Cairo": 50.0,
-      "al-Jizah": 40.0,
-      "Alexandria": 60.0,
-      "Aswan": 80.0,
-      "Luxor": 70.0,
+      "القاهره": 45,
+      "الجيزه": 45,
+      "الدقهلية": 55,
+      "الغربية": 55,
+      "الشرقية": 55,
+      "المنوفية": 55,
+      "كفر الشيخ": 55,
+      "البحيرة": 55,
+      "بورسعيد": 55,
+      "الإسماعيلية": 55,
+      "السويس": 55,
+      "الإسكندرية": 55,
+      "الغردقة": 80,
+      "الوادي": 80,
+      "مطروح": 80,
+      "شرم الشيخ": 95,
+      "العين السخنه": 95,
+      "بني سويف": 65,
+      "المنيا": 65,
+      "أسيوط": 65,
+      "سوهاج": 65,
+      "قنا": 65,
+      "الأقصر": 65,
+      "أسوان": 65,
+      "البحر الأحمر": 65,
     };
 
-    return shippingCosts[gov] ?? 100.0; // Default shipping cost if state is unknown
+    double cost = shippingCosts[gov] ?? 0;
+    print("Shipping cost found: $cost"); // Debugging
+    return cost;
   }
+
+
 
   Future<void> applyPromoCode(String promoCode,BuildContext context) async {
     if (state is CartLoaded) {

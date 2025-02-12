@@ -3,8 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:country_state_city_pro/country_state_city_pro.dart';
 import 'package:tarmim/features/cart/presentation/cart_respo.dart';
 import 'package:tarmim/features/cart/presentation/widgets/mobile/orderInfo.dart';
+import 'package:tarmim/features/delivery_details/presentaion/widgets/address_section.dart';
+import 'package:tarmim/features/delivery_details/presentaion/widgets/confirm_button.dart';
+import 'package:tarmim/features/delivery_details/presentaion/widgets/confirm_dialog.dart';
+import 'package:tarmim/features/delivery_details/presentaion/widgets/promo_section.dart';
 import '../../../core/commons/custom_button.dart';
 import '../../../core/commons/custom_text_field.dart';
+import '../../../core/utlis/validation_helper.dart';
 import '../../cart/presentation/manager/cart_cubit.dart';
 import '../../cart/presentation/manager/cart_state.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -33,7 +38,7 @@ class DeliveryMobile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              _AddressSection(
+              AddressSection(
                 nameController: nameController,
                 phoneController: phoneController,
                 emailController: emailController,
@@ -43,35 +48,34 @@ class DeliveryMobile extends StatelessWidget {
                 cityController: cityController,
               ),
               const SizedBox(height: 16),
-              _PromoCodeSection(promoCodeController: promoCodeController),
+              PromoCodeSection(promoCodeController: promoCodeController),
               const SizedBox(height: 16),
-              BlocBuilder<CartCubit, CartState>(
+              BlocConsumer<CartCubit, CartState>(
+                listener: (context, state) {
+                  print("Cart state changed! New total: ${(state as CartLoaded).totalPrice}");
+                },
                 builder: (context, state) {
                   double total = (state is CartLoaded) ? state.totalPrice : initialTotalPrice;
-                  double shippingCost = context.read<CartCubit>().getShippingCost(stateController.text);
-                  double finalPrice = total + shippingCost;
-                  double priceWithoutShipping = finalPrice - shippingCost;
+
 
                   return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       OrderInfoRowMobile(
                         label: AppLocalizations.of(context)!.finalPrice,
-                        value: stateController.text.isEmpty
-                            ? "${priceWithoutShipping.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}"
-                            : "${finalPrice.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}",
+                        value: "${total.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}",
                       ),
-                      const SizedBox(height: 16),
-                      _ConfirmButton(
-                        finalPrice: finalPrice,
+                      ConfirmButton(
+                        finalPrice: total,
                         validateFields: () => _validateFields(context),
-                        placeOrder: () => _placeOrder(context, finalPrice),
+                        placeOrder: () => _placeOrder(context, total),
                       ),
                       const SizedBox(height: 16),
                     ],
                   );
                 },
               ),
+
+
             ],
           ),
         ),
@@ -80,18 +84,35 @@ class DeliveryMobile extends StatelessWidget {
   }
 
   bool _validateFields(BuildContext context) {
+    String email = emailController.text.trim();
+    String phone = phoneController.text.trim();
+
     if (nameController.text.isEmpty ||
         phoneController.text.isEmpty ||
         emailController.text.isEmpty ||
         addressController.text.isEmpty ||
-        countryController.text.isEmpty ||
         stateController.text.isEmpty ||
         cityController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: Text(AppLocalizations.of(context)!.pleasFill)),
+        SnackBar(content: Text("Please fill all fields")),
       );
       return false;
     }
+
+    if (!ValidationHelper.isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid email format")),
+      );
+      return false;
+    }
+
+    if (!ValidationHelper.isValidPhone(phone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid phone number")),
+      );
+      return false;
+    }
+
     return true;
   }
 
@@ -99,7 +120,7 @@ class DeliveryMobile extends StatelessWidget {
     if (_validateFields(context)) {
       showDialog(
         context: context,
-        builder: (context) => _ConfirmDialog(
+        builder: (context) => ConfirmDialog(
           finalPrice: finalPrice,
           onConfirm: () {
             context.read<CartCubit>().updateLocation(
@@ -123,119 +144,8 @@ class DeliveryMobile extends StatelessWidget {
   }
 }
 
-/// **Reusable Address Section**
-class _AddressSection extends StatelessWidget {
-  final TextEditingController nameController;
-  final TextEditingController phoneController;
-  final TextEditingController emailController;
-  final TextEditingController addressController;
-  final TextEditingController countryController;
-  final TextEditingController stateController;
-  final TextEditingController cityController;
 
-  const _AddressSection({
-    required this.nameController,
-    required this.phoneController,
-    required this.emailController,
-    required this.addressController,
-    required this.countryController,
-    required this.stateController,
-    required this.cityController,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-         Text(AppLocalizations.of(context)!.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        CustomTextField(label: AppLocalizations.of(context)!.name, controller: nameController, maxLines: 1,),
-        const SizedBox(height: 16),
-        CountryStateCityPicker(
-          country: countryController,
-          state: stateController,
-          city: cityController,
-        ),
-        const SizedBox(height: 16),
-         Text(AppLocalizations.of(context)!.phone, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        CustomTextField(label: "01xxxxxxxxxx", controller: phoneController, maxLines: 1,),
-        const SizedBox(height: 16),
-         Text(AppLocalizations.of(context)!.email, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        CustomTextField(label: AppLocalizations.of(context)!.email, controller: emailController, maxLines: 1,),
-        const SizedBox(height: 16),
-         Text(AppLocalizations.of(context)!.address, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        CustomTextField(label: AppLocalizations.of(context)!.address, controller: addressController, maxLines: 2,),
-      ],
-    );
-  }
-}
 
-/// **Reusable Promo Code Section**
-class _PromoCodeSection extends StatelessWidget {
-  final TextEditingController promoCodeController;
 
-  const _PromoCodeSection({required this.promoCodeController});
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-         Text(AppLocalizations.of(context)!.promoCode, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        CustomTextField(label: AppLocalizations.of(context)!.enterPromoCode, controller: promoCodeController, maxLines: 1,),
-        const SizedBox(height: 8),
-        CustomButton(
-          onPressed: () {
-            if (promoCodeController.text.isNotEmpty) {
-              context.read<CartCubit>().applyPromoCode(promoCodeController.text,context);
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                 SnackBar(content: Text(AppLocalizations.of(context)!.pleaseEnterPromoCode)),
-              );
-            }
-          },
-          text:AppLocalizations.of(context)!.applyPromoCode,
-        ),
-      ],
-    );
-  }
-}
-
-/// **Reusable Confirm Order Button**
-class _ConfirmButton extends StatelessWidget {
-  final double finalPrice;
-  final VoidCallback placeOrder;
-  final bool Function() validateFields;
-
-  const _ConfirmButton({required this.finalPrice, required this.placeOrder, required this.validateFields});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomButton(
-      text: AppLocalizations.of(context)!.confirmOrder,
-      onPressed: () => validateFields() ? placeOrder() : null,
-    );
-  }
-}
-
-/// **Reusable Confirm Dialog**
-class _ConfirmDialog extends StatelessWidget {
-  final double finalPrice;
-  final VoidCallback onConfirm;
-
-  const _ConfirmDialog({required this.finalPrice, required this.onConfirm});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title:  Text(AppLocalizations.of(context)!.confirmOrder),
-      content: Text("${AppLocalizations.of(context)!.totalamount} ${finalPrice.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}"),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child:  Text(AppLocalizations.of(context)!.cancel)),
-        TextButton(onPressed: onConfirm, child:  Text(AppLocalizations.of(context)!.confirm))
-      ],
-    );
-  }
-}
