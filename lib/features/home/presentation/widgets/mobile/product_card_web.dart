@@ -33,6 +33,7 @@ class ProductCardWeb extends StatelessWidget {
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   child: CachedNetworkImage(
                     imageUrl: imageUrl,
+                    httpHeaders: {'Access-Control-Allow-Origin': '*'},
                     fit: BoxFit.cover,
                     width: double.infinity,
                     placeholder: (context, url) => const CircularProgressIndicator(),

@@ -32,7 +32,9 @@ class ProductDetailsWeb extends StatelessWidget {
                     flex: 1,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.network(state.selectedImage, fit: BoxFit.contain, width: 300, height: 400),
+                      child: Image.network(state.selectedImage, fit: BoxFit.contain, width: 300, height: 400,
+                      headers: {'Access-Control-Allow-Origin': '*'},
+                      ),
                     ),
                   ),
                   const SizedBox(width: 32),

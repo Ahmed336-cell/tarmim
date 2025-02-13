@@ -30,6 +30,7 @@ class CartItemWeb extends StatelessWidget {
                 height: 100,
                 width: 100,
                 fit: BoxFit.cover,
+                httpHeaders: {'Access-Control-Allow-Origin': '*'},
               ),
             ),
             const SizedBox(width: 16),
