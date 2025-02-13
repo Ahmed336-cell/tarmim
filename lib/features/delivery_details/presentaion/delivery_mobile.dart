@@ -52,7 +52,13 @@ class DeliveryMobile extends StatelessWidget {
               const SizedBox(height: 16),
               BlocConsumer<CartCubit, CartState>(
                 listener: (context, state) {
-                  print("Cart state changed! New total: ${(state as CartLoaded).totalPrice}");
+                  if (state is CartLoaded) {
+                    print("Cart state changed! New total: ${state.totalPrice}");
+                  } else if (state is CartError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.message)),
+                    );
+                  }
                 },
                 builder: (context, state) {
                   double total = (state is CartLoaded) ? state.totalPrice : initialTotalPrice;

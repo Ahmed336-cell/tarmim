@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/model/cart_item.dart';
 import '../../data/repo/cart_repo.dart';
@@ -23,12 +24,21 @@ class CartCubit extends Cubit<CartState> {
     emit(CartLoading());
     try {
       final items = await cartRepository.fetchCartItems();
-      double total = items.fold(0, (sum, item) => sum + item.totalPrice);
-      emit(CartLoaded(items: items, totalPrice: total));
+      double itemsTotal = items.fold(0, (sum, item) => sum + item.totalPrice);
+
+      // **احتساب مصاريف الشحن بناءً على آخر عنوان محفوظ**
+      double shippingCost = getShippingCost(gov);
+
+      emit(CartLoaded(
+        items: items,
+        totalPrice: itemsTotal + shippingCost,
+        shippingCost: shippingCost, // ✅ التأكد من تمرير قيمة الشحن
+      ));
     } catch (e) {
       emit(CartError(message: AppLocalizations.of(context)!.faildToLoadcart));
     }
   }
+
 
   Future<void> updateItemQuantity(CartItem item, int quantity, BuildContext context) async {
     item.quantity = quantity;
@@ -147,22 +157,42 @@ class CartCubit extends Cubit<CartState> {
 
 
 
-  Future<void> applyPromoCode(String promoCode,BuildContext context) async {
-    if (state is CartLoaded) {
-      final currentState = state as CartLoaded;
-      try {
-        final promoData = await cartRepository.validatePromoCode(promoCode);
-        if (promoData != null) {
-          final discountPercentage = promoData['discount_percentage'] as int;
-          double discountedTotal = currentState.totalPrice * (1 - discountPercentage / 100);
-          this.promoCode = promoCode; // Store applied promo code
-          emit(CartLoaded(items: currentState.items, totalPrice: discountedTotal));
-        }
-      } catch (e) {
-        emit(CartError(message: AppLocalizations.of(context)!.invalidPromoCode)); // Show specific error message
+  Future<void> applyPromoCode(String promoCode, BuildContext context) async {
+    if (state is! CartLoaded) return;
+
+    final currentState = state as CartLoaded;
+
+    try {
+      final promoData = await cartRepository.validatePromoCode(promoCode);
+
+      if (promoData != null) {
+        final discountPercentage = promoData['discount_percentage'] as int;
+
+        // ✅ حساب الخصم فقط على المنتجات بدون التأثير على الشحن
+        double discountedTotal = (currentState.totalPrice - currentState.shippingCost) * (1 - discountPercentage / 100);
+        double finalTotalPrice = discountedTotal + currentState.shippingCost; // ✅ إضافة الشحن بعد الخصم
+
+        this.promoCode = promoCode;
+
+        emit(CartLoaded(
+          items: currentState.items,
+          totalPrice: finalTotalPrice,
+          shippingCost: currentState.shippingCost, // ✅ الاحتفاظ بالشحن
+        ));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.invalidPromoCode)),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.invalidPromoCode)),
+      );
     }
   }
+
+
+
   Future<void> placeOrder(BuildContext context) async {
     if ([name, country, gov, city, address, phoneNumber, email].contains(null)) {
       emit(CartError(message: AppLocalizations.of(context)!.pleasFill));

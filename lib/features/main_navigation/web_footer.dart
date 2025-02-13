@@ -27,11 +27,7 @@ class CustomFooter extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _socialIcon('assets/icons/facebook.svg'),
-              _socialIcon('assets/icons/instagram.svg'),
-              _socialIcon('assets/icons/twitter.svg'),
-              _socialIcon('assets/icons/google.svg'),
-              _socialIcon('assets/icons/youtube.svg'),
+
             ],
           ),
           const SizedBox(height: 10),

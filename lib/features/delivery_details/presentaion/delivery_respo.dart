@@ -15,6 +15,16 @@ class DeliveryRespo extends StatelessWidget {
         if (constraints.maxWidth > 600) {
           return Scaffold(
 
+            appBar: AppBar(
+              automaticallyImplyLeading: true,
+              backgroundColor: Color(Constant.color),
+              centerTitle: true,
+              title:  Text(
+                AppLocalizations.of(context)!.address,
+                style: TextStyle(fontSize: 24,color: Colors.brown, fontWeight: FontWeight.bold),
+              ),
+            ),
+
             body:  DeliveryWeb(totalPrice: totalPrice,),
           );
         } else {

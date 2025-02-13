@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,27 +19,37 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'constants.dart';
-import 'features/cart/presentation/manager/cart_state.dart';
 import 'features/main_navigation/manager/language_cubit.dart';
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer = Observe(); // Your Bloc observer
 
-  await Supabase.initialize(
-    url: Constant.url,
-    anonKey: Constant.apiKay,
-  );
 
-  await SentryFlutter.init(
-        (options) {
-      options.dsn = Constant.sentryKey;
-      options.tracesSampleRate = 1.0; // Adjust for performance monitoring
-    },
-    appRunner: () {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-          .then((_) => runApp(MyApp()));
-    },
-  );
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    // Initialize Flutter Bloc Observer
+    Bloc.observer = Observe();
+
+    // Initialize Supabase
+    await Supabase.initialize(
+      url: Constant.url,
+      anonKey: Constant.apiKay,
+    );
+
+    // Lock device orientation
+    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+    // Initialize Sentry for error tracking
+    await SentryFlutter.init(
+          (options) {
+        options.dsn = Constant.sentryKey; // Replace with your actual DSN
+        options.tracesSampleRate = 1.0; // Adjust sampling rate if needed
+      },
+      appRunner: () => runApp(MyApp()), // Run the app inside Sentry’s tracking zone
+    );
+  }, (error, stackTrace) {
+    // Log unhandled errors to Sentry
+    Sentry.captureException(error, stackTrace: stackTrace);
+  });
 }
 
 class MyApp extends StatelessWidget {

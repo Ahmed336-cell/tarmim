@@ -37,6 +37,7 @@ class _MainLayoutState extends State<MainLayout> {
       AppLocalizations.of(context)!.home,
       AppLocalizations.of(context)!.contact,
       AppLocalizations.of(context)!.cart
+
     ];
 
     return Scaffold(
@@ -51,6 +52,7 @@ class _MainLayoutState extends State<MainLayout> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+
                   InkWell(
                     child: Image.asset(
                       "assets/images/log.png",
@@ -159,11 +161,7 @@ class WebNavigationBar extends StatelessWidget {
               _navItem(AppLocalizations.of(context)!.home, 0),
               _navItem(AppLocalizations.of(context)!.about, 1),
               InkWell(
-                child: SvgPicture.asset(
-                  'assets/images/cart.svg',
-                  width: 40,
-                  height: 40,
-                ),
+                child: Icon(Icons.shopping_cart_outlined),
                 onTap: () => onItemSelected(2),
               ),
             ],

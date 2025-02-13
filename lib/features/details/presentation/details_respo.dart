@@ -16,6 +16,7 @@ class DetailsRespo extends StatelessWidget {
         if (constraints.maxWidth > 600) {
           return Scaffold(
 
+
             body:  ProductDetailsWeb(product: product,),
           );
         } else {
