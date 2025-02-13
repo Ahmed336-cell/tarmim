@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:tarmim/bloc_observer.dart';
 import 'package:tarmim/features/cart/data/repo/cart_repo.dart';
@@ -25,14 +26,16 @@ import 'features/main_navigation/manager/language_cubit.dart';
 void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load(fileName: "env");
+
 
     // Initialize Flutter Bloc Observer
     Bloc.observer = Observe();
 
     // Initialize Supabase
     await Supabase.initialize(
-      url: Constant.url,
-      anonKey: Constant.apiKay,
+      url: Constant.supabaseUrl,
+      anonKey: Constant.apiKey,
     );
 
     // Lock device orientation

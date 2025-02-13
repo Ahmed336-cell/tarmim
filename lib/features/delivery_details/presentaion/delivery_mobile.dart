@@ -7,6 +7,7 @@ import 'package:tarmim/features/delivery_details/presentaion/widgets/address_sec
 import 'package:tarmim/features/delivery_details/presentaion/widgets/confirm_button.dart';
 import 'package:tarmim/features/delivery_details/presentaion/widgets/confirm_dialog.dart';
 import 'package:tarmim/features/delivery_details/presentaion/widgets/promo_section.dart';
+import 'package:tarmim/features/main_navigation/main_respo.dart';
 import '../../../core/commons/custom_button.dart';
 import '../../../core/commons/custom_text_field.dart';
 import '../../../core/utlis/validation_helper.dart';
@@ -140,6 +141,7 @@ class DeliveryMobile extends StatelessWidget {
             );
             context.read<CartCubit>().placeOrder(context);
             Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainRespo()));
             ScaffoldMessenger.of(context).showSnackBar(
                SnackBar(content: Text(AppLocalizations.of(context)!.orderPlacedSuccessfully)),
             );

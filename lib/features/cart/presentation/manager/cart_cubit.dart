@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/utlis/email_serves.dart';
 import '../../data/model/cart_item.dart';
 import '../../data/repo/cart_repo.dart';
 import 'cart_state.dart';
@@ -97,7 +98,9 @@ class CartCubit extends Cubit<CartState> {
     if (state is CartLoaded) {
       final currentState = state as CartLoaded;
 
-      double itemsTotal = currentState.items.fold(0, (sum, item) => sum + item.basePrice);
+      // ✅ Calculate total using quantity and price
+      double itemsTotal = currentState.items.fold(
+          0, (sum, item) => sum + (item.basePrice * item.quantity));
 
       this.gov = gov;
 
@@ -231,7 +234,15 @@ class CartCubit extends Cubit<CartState> {
 
       try {
         await cartRepository.submitOrder(order);
-
+        final emailService = EmailService();
+        await emailService.sendOrderConfirmation(
+          toEmail: email!,
+          toName: name!,
+          orderDetails: order.items.map((item) => item).toList(),
+          address: address!,
+          city: city!,
+          gov: gov!,
+        );
         // Increment promo code usage if applied
         if (promoCode.isNotEmpty) {
           await cartRepository.incrementPromoCodeUsage(promoCode);
