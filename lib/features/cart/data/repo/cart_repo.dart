@@ -72,12 +72,26 @@ class CartRepository {
   }
 
   Future<void> incrementPromoCodeUsage(String promoCode) async {
-    await supabase
-        .from('promo_codes')
-        .update({'used_count': supabase.from('promo_codes').select('used_count').single().then((value) => value['used_count'] + 1)})
-        .eq('code', promoCode)
-        .single();
+    try {
+      final response = await supabase
+          .from('promo_codes')
+          .select('used_count')
+          .eq('code', promoCode)
+          .single();
+
+      if (response != null) {
+        int newUsedCount = (response['used_count'] ?? 0) + 1;
+
+        await supabase
+            .from('promo_codes')
+            .update({'used_count': newUsedCount})
+            .eq('code', promoCode);
+      }
+    } catch (e) {
+      throw Exception("Failed to increment promo code usage: ${e.toString()}");
+    }
   }
+
 
 
   Future<void> addCartItem(CartItem item) async {

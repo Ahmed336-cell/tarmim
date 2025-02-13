@@ -52,14 +52,7 @@ class PromoCodeSection extends StatelessWidget {
             const SizedBox(height: 16),
 
             /// **💰 Display Total & Shipping Cost**
-            Text(
-              "${AppLocalizations.of(context)!.totalPrice}: ${totalPrice.toStringAsFixed(2)}",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              "${AppLocalizations.of(context)!.shippingFees}: ${shippingCost.toStringAsFixed(2)}",
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
+
           ],
         );
       },

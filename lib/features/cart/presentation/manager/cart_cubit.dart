@@ -162,23 +162,35 @@ class CartCubit extends Cubit<CartState> {
 
     final currentState = state as CartLoaded;
 
+    // ❌ Prevent re-applying the same promo code
+    if (this.promoCode == promoCode) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.invalidPromoCode)),
+      );
+      return;
+    }
+
     try {
       final promoData = await cartRepository.validatePromoCode(promoCode);
 
       if (promoData != null) {
         final discountPercentage = promoData['discount_percentage'] as int;
 
-        // ✅ حساب الخصم فقط على المنتجات بدون التأثير على الشحن
+        // ✅ Ensure discount applies only ONCE
         double discountedTotal = (currentState.totalPrice - currentState.shippingCost) * (1 - discountPercentage / 100);
-        double finalTotalPrice = discountedTotal + currentState.shippingCost; // ✅ إضافة الشحن بعد الخصم
+        double finalTotalPrice = discountedTotal + currentState.shippingCost;
 
-        this.promoCode = promoCode;
+        this.promoCode = promoCode; // Store applied promo
 
         emit(CartLoaded(
           items: currentState.items,
           totalPrice: finalTotalPrice,
-          shippingCost: currentState.shippingCost, // ✅ الاحتفاظ بالشحن
+          shippingCost: currentState.shippingCost,
         ));
+
+        // Increment promo usage in the database
+        await cartRepository.incrementPromoCodeUsage(promoCode);
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.invalidPromoCode)),
