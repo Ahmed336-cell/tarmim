@@ -5,7 +5,7 @@ import 'package:tarmim/constants.dart';
 import 'package:tarmim/features/cart/data/model/cart_item.dart';
 
 class EmailService {
-  final String apiKey = dotenv.env['mailApiKey']!;
+  final String apiKey = Constant.mailApiKey;
 
   Future<void> sendOrderConfirmation({
     required String toEmail,

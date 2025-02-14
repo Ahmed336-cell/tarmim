@@ -28,15 +28,14 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
 
     // Web
-    await dotenv.load(fileName: 'config.env');
 
 
     Bloc.observer = Observe();
 
     // Initialize Supabase
     await Supabase.initialize(
-      url: dotenv.env['url']!,
-      anonKey: dotenv.env['apiKay']!,
+      url: Constant.url,
+      anonKey: Constant.apiKay,
     );
 
     // Lock device orientation
@@ -45,7 +44,7 @@ void main() {
     // Initialize Sentry for error tracking
     await SentryFlutter.init(
           (options) {
-        options.dsn = dotenv.env['sentryKey']; // Replace with your actual DSN
+        options.dsn = Constant.sentryKey; // Replace with your actual DSN
         options.tracesSampleRate = 1.0; // Adjust sampling rate if needed
       },
       appRunner: () => runApp(MyApp()), // Run the app inside Sentry’s tracking zone
