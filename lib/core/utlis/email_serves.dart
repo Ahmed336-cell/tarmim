@@ -14,6 +14,7 @@ class EmailService {
     required String city,
     required String gov,
     required List<CartItem> orderDetails,
+    required String totalPrice,
   }) async {
     const String apiUrl = 'https://api.brevo.com/v3/smtp/email';
     String formattedOrderDetails = orderDetails.map((item) {
@@ -32,6 +33,7 @@ class EmailService {
   <p>Your order has been placed successfully. Here are your order details:</p>
   <pre>$formattedOrderDetails</pre>
   <p><strong>Shipping Address:</strong> $address, $city, $gov</p>
+  <h3>total price : $totalPrice</h3>
   <h3>Best regards,<br>Your Store Team</h3>
 ''',
 

@@ -26,9 +26,11 @@ import 'features/main_navigation/manager/language_cubit.dart';
 void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await dotenv.load(fileName: "config.env");
 
-    // Initialize Flutter Bloc Observer
+    // Web
+    await dotenv.load(fileName: 'config.env');
+
+
     Bloc.observer = Observe();
 
     // Initialize Supabase

@@ -242,6 +242,7 @@ class CartCubit extends Cubit<CartState> {
           address: address!,
           city: city!,
           gov: gov!,
+          totalPrice: finalPrice.toStringAsFixed(2)
         );
         // Increment promo code usage if applied
         if (promoCode.isNotEmpty) {

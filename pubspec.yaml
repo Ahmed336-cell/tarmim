@@ -85,6 +85,7 @@ flutter:
     - assets/images/
     - assets/jsons/
     - assets/config.env
+    - assets/.env
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
