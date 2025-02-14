@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:tarmim/constants.dart';
 import 'package:tarmim/features/cart/data/model/cart_item.dart';
 
 class EmailService {
-  final String apiKey = Constant.mailApiKey;
+  final String apiKey = dotenv.env['mailApiKey']!;
 
   Future<void> sendOrderConfirmation({
     required String toEmail,
